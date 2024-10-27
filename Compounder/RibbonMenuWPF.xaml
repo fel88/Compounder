@@ -1,0 +1,69 @@
+﻿<UserControl x:Class="Compounder.RibbonMenuWPF"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Compounder"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="1200">
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Ribbon x:Name="RibbonWin"  SelectedIndex="0">
+            <Ribbon.HelpPaneContent>
+                <RibbonButton x:Name="HelpButton" Click="HelpButton_Click"  SmallImageSource="Icons\question.png"/>
+            </Ribbon.HelpPaneContent>
+            <Ribbon.ApplicationMenu>
+                <RibbonApplicationMenu Visibility="Collapsed">
+
+                </RibbonApplicationMenu>
+            </Ribbon.ApplicationMenu>
+            <Ribbon.QuickAccessToolBar>
+                <RibbonQuickAccessToolBar Visibility="Collapsed">
+
+                </RibbonQuickAccessToolBar>
+            </Ribbon.QuickAccessToolBar>
+            <RibbonTab x:Name="projectTab" Header="Project" KeyTip="H" >
+                <!-- Home  group-->
+                <RibbonGroup x:Name="General" Header="General">
+                    <RibbonToggleButton  Label="Selection"  KeyTip="X"  SmallImageSource="Icons/cursor.ico"/>
+                    <RibbonButton   Label="Fit all"  KeyTip="F" SmallImageSource="Icons/magnifier.ico"/>
+                    <RibbonButton  Label="Undo"  SmallImageSource="Icons/arrow-curve-180-left.ico" />
+
+
+
+        
+                </RibbonGroup>
+           
+              
+               
+        
+
+                <RibbonGroup x:Name="layout" Header="Layout ">
+                    <RibbonButton  Label="Automatic" KeyTip="B" Click="RibbonButton_Click"   SmallImageSource="Icons/application-tile.png"/>
+                    <RibbonButton  Label="Spring" KeyTip="S"   SmallImageSource="Icons/molecule.png"/>
+
+                  
+                 
+                    
+                    
+                  
+                </RibbonGroup>
+               
+
+               
+             
+                <RibbonGroup x:Name="settings" Header="Settings ">
+                    <RibbonButton  Label="Settings" SmallImageSource="Icons/gear.png" />
+                </RibbonGroup>
+                
+            </RibbonTab>
+
+
+        
+        </Ribbon>
+    </Grid>
+</UserControl>
