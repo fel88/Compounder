@@ -37,7 +37,7 @@
             ClientSize = new Size(1184, 761);
             Name = "Form1";
             StartPosition = FormStartPosition.CenterScreen;
-            Text = "Compounder: graphs viewer";
+            Text = "Compounder: graphs/diagram viewer";
             Load += Form1_Load;
             ResumeLayout(false);
         }

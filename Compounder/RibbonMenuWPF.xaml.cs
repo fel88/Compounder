@@ -26,7 +26,7 @@ namespace Compounder
             }
         }
      
-        public Form1 Form => Form1.Form;
+        public Form2 Form => Form2.Form;
 
         private void HelpButton_Click(object sender, RoutedEventArgs e)
         {
@@ -68,6 +68,11 @@ namespace Compounder
         }
 
         private void fitAll()
+        {
+
+        }
+
+        private void ImportImage_click(object sender, RoutedEventArgs e)
         {
 
         }
