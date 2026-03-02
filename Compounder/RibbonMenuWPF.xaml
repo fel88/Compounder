@@ -102,7 +102,11 @@
                         KeyTip="B"
                         Label="Rect"
                         SmallImageSource="Icons/layer-shape.ico" />
-
+                    <RibbonButton
+                        Click="Arrow_click"
+                        KeyTip="B"
+                        Label="Arrow"
+                        SmallImageSource="Icons/arrow-045.png" />
                 </RibbonGroup>
 
 

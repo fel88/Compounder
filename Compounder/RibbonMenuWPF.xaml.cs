@@ -106,6 +106,11 @@ namespace Compounder
         {
             Form.Undo();
         }
+
+        private void Arrow_click(object sender, RoutedEventArgs e)
+        {
+            Form.CreateArrow();
+        }
     }
 
 }

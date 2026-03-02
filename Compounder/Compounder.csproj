@@ -17,6 +17,7 @@
     <None Remove="Icons\abacus.png" />
     <None Remove="Icons\anchor.png" />
     <None Remove="Icons\application-tile.png" />
+    <None Remove="Icons\arrow-045.png" />
     <None Remove="Icons\arrow-circle-315.png" />
     <None Remove="Icons\arrow-curve-180-left.ico" />
     <None Remove="Icons\arrow-move.png" />
@@ -74,6 +75,7 @@
     <Resource Include="Icons\abacus.png" />
     <Resource Include="Icons\anchor.png" />
     <Resource Include="Icons\application-tile.png" />
+    <Resource Include="Icons\arrow-045.png" />
     <Resource Include="Icons\arrow-circle-315.png" />
     <Resource Include="Icons\arrow-curve-180-left.ico" />
     <Resource Include="Icons\arrow-move.png" />

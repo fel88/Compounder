@@ -3,7 +3,7 @@ using System.Xml.Linq;
 
 namespace Compounder
 {
-    public class RectObject : AbstractSceneObject, ISceneObject
+    public class RectObject : AbstractSceneObject, ISceneObject, IOffsetableSceneObject
     {
         public Vector2d Location{ get; set; }
         public double Width { get; set; }
@@ -47,16 +47,20 @@ namespace Compounder
                 var idx = d.GetOptionsFieldIdx("command");
                 if (idx == 0)*/
                 {
-                    var dd = AutoDialog.DialogHelpers.StartDialog();
-                    dd.AddNumericField("width", "Width", Width);
-                    dd.AddNumericField("height", "Height", Height);
-                    dd.AddStringField("text", "Text", Text);
-                    if (!dd.ShowDialog())
-                        return;
+                    if (CheckHovered(dc, mdc.Location))
+                    {
+                        ev.Handled = true;
 
-                    Width = dd.GetNumericField("width");
-                    Height = dd.GetNumericField("height");
-                    Text = dd.GetStringField("text");
+                        var dd = AutoDialog.DialogHelpers.StartDialog();
+                        dd.AddNumericField("width", "Width", Width);
+                        dd.AddNumericField("height", "Height", Height);
+                        dd.AddStringField("text", "Text", Text);
+                        if (!dd.ShowDialog())
+                            return;
+                        Width = dd.GetNumericField("width");
+                        Height = dd.GetNumericField("height");
+                        Text = dd.GetStringField("text");
+                    }
                 }
             }
             else if (ev is UiMouseEvent mev)
@@ -74,6 +78,11 @@ namespace Compounder
         public BBox GetBBox()
         {
             return new BBox(Location.X, Location.Y - Height, Width, Height);
+        }
+
+        public void Offset(Vector2d v)
+        {
+            Location += v;
         }
 
         public XElement ToXml()

@@ -120,7 +120,7 @@ namespace Compounder
                     if (allSelected.Count() > 1)//draw outskirt
                     {
                         var t00 = dc.Transform(combinedBbox.Location);
-                        var rect = new RectangleF(t0.X, t0.Y, combinedBbox.Width.ToFloat() * dc.zoom , combinedBbox.Height.ToFloat() * dc.zoom);
+                        var rect = new RectangleF(t0.X, t0.Y, combinedBbox.Width.ToFloat() * dc.zoom, combinedBbox.Height.ToFloat() * dc.zoom);
                         dc.gr.DrawRectangle(pen, rect);
                     }
                     //draw snaps: rotate, move
@@ -176,9 +176,9 @@ namespace Compounder
                 return;
 
             var offset = new Vector2d(d.GetNumericField("x"), d.GetNumericField("y"));
-            foreach (var item in Objects.Where(z => z.IsSelected))
+            foreach (var item in Objects.OfType<IOffsetableSceneObject>().Where(z => z.IsSelected))
             {
-                item.Location += offset;
+                item.Offset(offset);
             }
         }
 
@@ -226,10 +226,15 @@ namespace Compounder
         Stack<XElement> undoStack = new Stack<XElement>();
         internal void Undo()
         {
-            if (undoStack.Count == 0) 
+            if (undoStack.Count == 0)
                 return;
 
             project = new CompounderProject(undoStack.Pop());
+        }
+
+        internal void CreateArrow()
+        {
+            Objects.Add(new ArrowSceneObject() { Source = new ConnectorPoint() { RelativePositon = new Vector2d(0, 0) }, Target = new ConnectorPoint() { RelativePositon = new Vector2d(100, 100) } });
         }
     }
 }
