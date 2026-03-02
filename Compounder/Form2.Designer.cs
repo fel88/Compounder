@@ -28,14 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
             pictureBox1 = new PictureBox();
             tableLayoutPanel1 = new TableLayoutPanel();
+            contextMenuStrip1 = new ContextMenuStrip(components);
+            bringFrontToolStripMenuItem = new ToolStripMenuItem();
+            sendBackToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             tableLayoutPanel1.SuspendLayout();
+            contextMenuStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // pictureBox1
             // 
+            pictureBox1.ContextMenuStrip = contextMenuStrip1;
             pictureBox1.Location = new Point(3, 3);
             pictureBox1.Name = "pictureBox1";
             pictureBox1.Size = new Size(1178, 755);
@@ -57,6 +63,25 @@
             tableLayoutPanel1.Size = new Size(1184, 761);
             tableLayoutPanel1.TabIndex = 1;
             // 
+            // contextMenuStrip1
+            // 
+            contextMenuStrip1.Items.AddRange(new ToolStripItem[] { bringFrontToolStripMenuItem, sendBackToolStripMenuItem });
+            contextMenuStrip1.Name = "contextMenuStrip1";
+            contextMenuStrip1.Size = new Size(132, 48);
+            // 
+            // bringFrontToolStripMenuItem
+            // 
+            bringFrontToolStripMenuItem.Name = "bringFrontToolStripMenuItem";
+            bringFrontToolStripMenuItem.Size = new Size(131, 22);
+            bringFrontToolStripMenuItem.Text = "bring front";
+            // 
+            // sendBackToolStripMenuItem
+            // 
+            sendBackToolStripMenuItem.Name = "sendBackToolStripMenuItem";
+            sendBackToolStripMenuItem.Size = new Size(131, 22);
+            sendBackToolStripMenuItem.Text = "send back";
+            sendBackToolStripMenuItem.Click += sendBackToolStripMenuItem_Click;
+            // 
             // Form2
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -68,6 +93,7 @@
             Text = "Compounder: graphs/diagram viewer";
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             tableLayoutPanel1.ResumeLayout(false);
+            contextMenuStrip1.ResumeLayout(false);
             ResumeLayout(false);
         }
 
@@ -75,5 +101,8 @@
 
         private PictureBox pictureBox1;
         private TableLayoutPanel tableLayoutPanel1;
+        private ContextMenuStrip contextMenuStrip1;
+        private ToolStripMenuItem bringFrontToolStripMenuItem;
+        private ToolStripMenuItem sendBackToolStripMenuItem;
     }
 }

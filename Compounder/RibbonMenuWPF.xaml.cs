@@ -74,7 +74,32 @@ namespace Compounder
 
         private void ImportImage_click(object sender, RoutedEventArgs e)
         {
+            Form.ImportImage();
+        }
 
+        private void SaveAsProject_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void OpenProject_click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Delete_click(object sender, RoutedEventArgs e)
+        {
+            Form.DeleteSelected();
+        }
+
+        private void Move_click(object sender, RoutedEventArgs e)
+        {
+            Form.MoveSelected();
+        }
+
+        private void Rect_click(object sender, RoutedEventArgs e)
+        {
+            Form.CreateRect();
         }
     }
 

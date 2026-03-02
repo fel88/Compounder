@@ -47,9 +47,33 @@
 
 
                 </RibbonGroup>
+                <RibbonGroup x:Name="Scene" Header="Scene">
+                    <RibbonToggleButton
+                        Click="Delete_click"
+                        KeyTip="D"
+                        Label="Delete"
+                        SmallImageSource="Icons/cross-button.ico" />
+                    <RibbonToggleButton
+                        Click="Move_click"
+                        KeyTip="M"
+                        Label="Move"
+                        SmallImageSource="Icons/arrow-move.png" />
+                </RibbonGroup>
 
 
+                <RibbonGroup x:Name="project" Header="Project">
+                    <RibbonButton
+                        Click="OpenProject_click"
+                        KeyTip="B"
+                        Label="Open"
+                        SmallImageSource="Icons/folder-horizontal-open.png" />
+                    <RibbonButton
+                        Click="SaveAsProject_Click"
+                        KeyTip="S"
+                        Label="Save as"
+                        SmallImageSource="Icons/disk.ico" />
 
+                </RibbonGroup>
 
 
                 <RibbonGroup x:Name="layout" Header="Layout ">
@@ -70,6 +94,11 @@
                         KeyTip="B"
                         Label="Import image"
                         SmallImageSource="Icons/image-sunset.png" />
+                    <RibbonButton
+                        Click="Rect_click"
+                        KeyTip="B"
+                        Label="Rect"
+                        SmallImageSource="Icons/layer-shape.ico" />
 
                 </RibbonGroup>
 

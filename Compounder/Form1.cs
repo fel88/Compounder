@@ -124,13 +124,13 @@ namespace Compounder
             }
             if (first)
             {
-                
+
                 // build and compile our shader zprogram
                 // ------------------------------------                
                 //lightingShader = new Shader("2.2.basic_lighting.vs", "2.2.basic_lighting.fs");
                 shader = new Shader("text.vs", "text.fs");
 
-             
+
                 Matrix4 projection = Matrix4.CreateOrthographicOffCenter(0, glControl.Width, 0, glControl.Height, 0, 1);
 
                 shader.use();
@@ -177,11 +177,11 @@ namespace Compounder
             Matrix4 modelview2 = Matrix4.LookAt(0, 0, 70, 0, 0, 0, 0, 1, 0);
             GL.MatrixMode(MatrixMode.Modelview);
             GL.LoadMatrix(ref modelview2);
-            
+
             GL.Disable(EnableCap.DepthTest);
 
             DrawBackground();
-            
+
             GL.PushMatrix();
             GL.Translate(camera1.viewport[2] / 2 - 50, -camera1.viewport[3] / 2 + 50, 0);
             GL.Scale(0.5, 0.5, 0.5);
@@ -216,7 +216,7 @@ namespace Compounder
             {
                 DrawAxes();
             }
-      GL.Enable(EnableCap.Light0);
+            GL.Enable(EnableCap.Light0);
 
             GL.ShadeModel(ShadingModel.Smooth);
             //  foreach (var item in Helpers)
@@ -231,7 +231,7 @@ namespace Compounder
             //GL.Viewport(0, 0, glControl.Width, glControl.Height);
 
             Matrix4 projection = Matrix4.CreateOrthographicOffCenter(0, glControl.Width, 0, glControl.Height, -1000, 1000);
-            
+
             shader.use();
 
 
@@ -239,13 +239,13 @@ namespace Compounder
             GL.UseProgram(0);
             //   GL.ClearColor(0.2f, 0.3f, 0.3f, 1f);
             //   GL.Clear(ClearBufferMask.ColorBufferBit);
-            
-             GL.Enable(EnableCap.CullFace);
-              GL.Enable(EnableCap.Blend);
-              GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
 
-              
-             
+            GL.Enable(EnableCap.CullFace);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+
+
             RenderText(shader, "This is sample text", -0, -0, 1.0f, new Vector3(0.5f, 0.8f, 0.2f));
             RenderText(shader, "(C) LearnOpenGL.com", -0, 50, 0.5f, new Vector3(0.3f, 0.7f, 0.9f));
             GL.Disable(EnableCap.CullFace);
