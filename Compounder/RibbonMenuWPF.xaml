@@ -41,19 +41,22 @@
                         KeyTip="F"
                         Label="Fit all"
                         SmallImageSource="Icons/magnifier.ico" />
-                    <RibbonButton Label="Undo" SmallImageSource="Icons/arrow-curve-180-left.ico" />
+                    <RibbonButton
+                        Click="Undo_click"
+                        Label="Undo"
+                        SmallImageSource="Icons/arrow-curve-180-left.ico" />
 
 
 
 
                 </RibbonGroup>
                 <RibbonGroup x:Name="Scene" Header="Scene">
-                    <RibbonToggleButton
+                    <RibbonButton
                         Click="Delete_click"
                         KeyTip="D"
                         Label="Delete"
                         SmallImageSource="Icons/cross-button.ico" />
-                    <RibbonToggleButton
+                    <RibbonButton
                         Click="Move_click"
                         KeyTip="M"
                         Label="Move"

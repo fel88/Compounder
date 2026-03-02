@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System.Xml.Linq;
 
 namespace Compounder
 {
@@ -33,8 +34,9 @@ namespace Compounder
 
         }
 
-        public void Event(DrawingContext dc, IUIEvent ev)
+        public void Event(IUIEvent ev)
         {
+            var dc = ev.DrawingContext;
             if (ev is UiMouseDoubleClickEvent mdc)
             {
                 /*var d = AutoDialog.DialogHelpers.StartDialog();
@@ -67,6 +69,17 @@ namespace Compounder
                     return;
                 }
             }
+        }
+
+        public BBox GetBBox()
+        {
+            return new BBox(Location.X, Location.Y - Height, Width, Height);
+        }
+
+        public XElement ToXml()
+        {
+            XElement ret = new XElement("rect");
+            return ret;
         }
     }
 }

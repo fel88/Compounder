@@ -1,15 +1,18 @@
 ﻿using OpenTK.Mathematics;
+using System.Windows.Input;
 
 namespace Compounder
 {
-    public class UiMouseEvent : IUIEvent
+    public class UiMouseEvent : AbstractUiEvent, IUIEvent
     {
         public Vector2d Location;
         public MouseButtons Button;
-        public bool Handled { get; set; }
-    }
-    public class UiMouseDoubleClickEvent : UiMouseEvent
-    {
+
+        public UiMouseEvent(DrawingContext dc, Control parent) : base(dc, parent)
+        {
+        }
+
         
+
     }
 }

@@ -79,12 +79,12 @@ namespace Compounder
 
         private void SaveAsProject_Click(object sender, RoutedEventArgs e)
         {
-
+            Form.SaveAsProject();
         }
 
         private void OpenProject_click(object sender, RoutedEventArgs e)
         {
-
+            Form.OpenProject();
         }
 
         private void Delete_click(object sender, RoutedEventArgs e)
@@ -100,6 +100,11 @@ namespace Compounder
         private void Rect_click(object sender, RoutedEventArgs e)
         {
             Form.CreateRect();
+        }
+
+        private void Undo_click(object sender, RoutedEventArgs e)
+        {
+            Form.Undo();
         }
     }
 

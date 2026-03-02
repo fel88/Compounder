@@ -5,13 +5,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
+using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Media.Animation;
+using System.Xml.Linq;
 
 namespace Compounder
 {
@@ -34,13 +37,25 @@ namespace Compounder
             System.Windows.Forms.Application.AddMessageFilter(mf);
             dc.Init(pictureBox1);
             pictureBox1.MouseDown += PictureBox1_MouseDown;
+            pictureBox1.MouseUp += PictureBox1_MouseUp;
             pictureBox1.MouseDoubleClick += PictureBox1_MouseDoubleClick;
+        }
+
+        private void PictureBox1_MouseUp(object? sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                if ((Math.Abs(dc.lastDragDiffX) + Math.Abs(dc.lastDragDiffY)) < 3)
+                    contextMenuStrip1.Show(pictureBox1, e.Location);
+            }
         }
 
         private void PictureBox1_MouseDoubleClick(object? sender, MouseEventArgs e)
         {
+            if ((Control.ModifierKeys & Keys.Control) != 0)
+                return;
             var curp = dc.GetCursor();
-            var me = new UiMouseDoubleClickEvent() { Button = e.Button, Location = curp };
+            var me = new UiMouseDoubleClickEvent(dc, this) { Button = e.Button, Location = curp };
             if (e.Button == MouseButtons.Left)
             {
                 foreach (var item in Objects)
@@ -51,7 +66,7 @@ namespace Compounder
             var ord = Objects.OrderBy(z => z.ZOrder).ToArray();
             foreach (var item in ord.Reverse())
             {
-                item.Event(dc, me);
+                item.Event(me);
                 if (me.Handled)
                     break;
             }
@@ -60,8 +75,8 @@ namespace Compounder
         private void PictureBox1_MouseDown(object? sender, MouseEventArgs e)
         {
             var curp = dc.GetCursor();
-            var me = new UiMouseEvent() { Button = e.Button, Location = curp };
-            if (e.Button == MouseButtons.Left)
+            var me = new UiMouseEvent(dc, this) { Button = e.Button, Location = curp };
+            if (e.Button == MouseButtons.Left && (ModifierKeys & Keys.Control) == 0)
             {
                 foreach (var item in Objects)
                 {
@@ -71,7 +86,7 @@ namespace Compounder
             var ord = Objects.OrderBy(z => z.ZOrder).ToArray();
             foreach (var item in ord.Reverse())
             {
-                item.Event(dc, me);
+                item.Event(me);
                 if (me.Handled)
                     break;
             }
@@ -92,6 +107,25 @@ namespace Compounder
             var t2 = dc.Transform(0, 100);
             dc.gr.DrawLine(Pens.Green, t0, t1);
             dc.gr.DrawLine(Pens.Red, t0, t2);
+
+            var allSelected = (Objects.Where(z => z.IsSelected)).ToArray();
+            var bboxes = allSelected.Select(z => z.GetBBox()).ToArray();
+            if (bboxes.Any())
+            {
+                var combinedBbox = bboxes.Aggregate((z, y) => z.Combine(y));
+                if (combinedBbox.Area > 0)
+                {
+                    var pen = new Pen(Color.LightGreen, 2);
+                    pen.DashPattern = [5, 5, 10, 10];
+                    if (allSelected.Count() > 1)//draw outskirt
+                    {
+                        var t00 = dc.Transform(combinedBbox.Location);
+                        var rect = new RectangleF(t0.X, t0.Y, combinedBbox.Width.ToFloat() * dc.zoom , combinedBbox.Height.ToFloat() * dc.zoom);
+                        dc.gr.DrawRectangle(pen, rect);
+                    }
+                    //draw snaps: rotate, move
+                }
+            }
             foreach (var item in Objects.OrderBy(z => z.ZOrder))
             {
                 item.Draw(dc);
@@ -108,7 +142,7 @@ namespace Compounder
             // Invalidate will cause the Paint event on your GLControl to fire
             pictureBox1.Invalidate(); // _glControl is obviously a private reference to the GLControl
         }
-        List<ISceneObject> Objects = new List<ISceneObject>();
+        List<ISceneObject> Objects => project.Objects;
         internal void ImportImage()
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -129,6 +163,7 @@ namespace Compounder
 
         internal void DeleteSelected()
         {
+            StackState();
             Objects.RemoveAll(z => z.IsSelected);
         }
 
@@ -162,6 +197,39 @@ namespace Compounder
             {
                 item.ZOrder -= minZorder;
             }
+        }
+
+        public void OpenProject()
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() != DialogResult.OK)
+                return;
+
+            project = new CompounderProject(XDocument.Load(ofd.FileName).Root);
+        }
+
+        internal void SaveAsProject()
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            if (sfd.ShowDialog() != DialogResult.OK)
+                return;
+
+            var xml = project.ToXml();
+            File.WriteAllText(sfd.FileName, xml.ToString());
+        }
+
+        public void StackState()
+        {
+            undoStack.Push(project.ToXml());
+        }
+
+        Stack<XElement> undoStack = new Stack<XElement>();
+        internal void Undo()
+        {
+            if (undoStack.Count == 0) 
+                return;
+
+            project = new CompounderProject(undoStack.Pop());
         }
     }
 }

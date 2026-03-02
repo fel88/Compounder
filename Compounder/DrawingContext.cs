@@ -18,15 +18,17 @@ namespace Compounder
         public float zoom = 1;
 
         public Bitmap Bmp;
-
+        public float lastDragDiffX;
+        public float lastDragDiffY;
         public void UpdateDrag()
         {
             if (isDrag)
             {
                 var p = PictureBox.PointToClient(Cursor.Position);
-
-                sx = origsx + ((p.X - startx) / zoom);
-                sy = origsy + (-(p.Y - starty) / zoom);
+                lastDragDiffX = (p.X - startx) / zoom;
+                lastDragDiffY = -(p.Y - starty) / zoom;
+                sx = origsx + lastDragDiffX;
+                sy = origsy + lastDragDiffY;
             }
         }
 

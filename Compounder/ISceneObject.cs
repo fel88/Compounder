@@ -1,4 +1,5 @@
 ﻿using OpenTK.Mathematics;
+using System.Xml.Linq;
 
 namespace Compounder
 {
@@ -9,6 +10,9 @@ namespace Compounder
         double ZOrder { get; set; }
         Vector2d Location { get; set; }
         bool CheckHovered(DrawingContext dctx, Vector2d location);
-        void Event(DrawingContext dctx, IUIEvent ev);
+        void Event(IUIEvent ev);
+        XElement ToXml();
+        BBox GetBBox();
+
     }
 }
