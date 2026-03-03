@@ -51,7 +51,8 @@ namespace Compounder
             pos += new Vector2d(0.5 * Width * dc.zoom, 0.5 * Height * dc.zoom);
             Color borderColor = Color.Black;
             Color fillColor = Color.Yellow;
-            bool hovered = CheckHovered(dc, dc.GetCursor());
+            //bool hovered = CheckHovered(dc, dc.GetCursor());
+            var hovered = IsHovered;
             if (IsSelected)
             {
                 borderColor = Color.LightGreen;
@@ -74,18 +75,19 @@ namespace Compounder
             dc.gr.DrawString(Text, font, Brushes.Black, pos.ToPointF());
 
             dc.gr.Transform = trans;
-            if (hovered)
-            {
-                var pos1 = dc.GetCursor().Screen.ToPointF();
-                var mss = dc.gr.MeasureString(Text, font);
-                dc.gr.FillRectangle(Brushes.White, pos1.X, pos1.Y-mss.Height, mss.Width, mss.Height);
-                dc.gr.DrawString(Text, font, Brushes.Black, pos1.X, pos1.Y - mss.Height);
-            }
+           
         }
 
         public void Event(IUIEvent ev)
         {
             var dc = ev.DrawingContext;
+            if (ev is UiMouseMoveEvent mme)
+            {
+                IsHovered = CheckHovered(dc, mme.Location);
+                if (IsHovered)
+                    mme.Handled = true;
+            }
+            else
             if (ev is UiMouseDoubleClickEvent mdc)
             {
                 /*var d = AutoDialog.DialogHelpers.StartDialog();
@@ -123,7 +125,7 @@ namespace Compounder
                     }
                 }
             }
-            else if (ev is UiMouseEvent mev)
+            else if (ev is UiMouseClickEvent mev)
             {
                 if (mev.Button == MouseButtons.Left)
                 {

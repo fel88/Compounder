@@ -75,7 +75,11 @@
                         KeyTip="S"
                         Label="Save as"
                         SmallImageSource="Icons/disk.ico" />
-
+                    <RibbonButton
+                        Click="Clear_click"
+                        KeyTip="S"
+                        Label="Clear"
+                        SmallImageSource="Icons/broom.png" />
                 </RibbonGroup>
 
 

@@ -5,6 +5,9 @@
         void ResetTool();
         void SetTool(ITool tool);
         ITool CurrentTool { get; }
+        CompounderProject Project { get;  }
         ISceneObject[] GetSelected();
+        List<ISceneObject> VirtualObjects { get; } 
+
     }
 }

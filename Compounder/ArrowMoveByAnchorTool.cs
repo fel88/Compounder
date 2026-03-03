@@ -1,19 +1,21 @@
 ﻿using Compounder.Interfaces;
 using OpenTK.Mathematics;
-using System.Security.Cryptography;
 
 namespace Compounder
 {
-    public class MoveByAnchorTool : AbstractTool, ITool
+    public class ArrowMoveByAnchorTool : AbstractTool, ITool
     {
-        public MoveByAnchorTool(MoveAnchor parent, IEditor editor, IDrawingContext dc) : base(editor, dc)
+        public ArrowMoveByAnchorTool(ArrowSceneObject parent, ArrowMoveAnchor anchor, IEditor editor, IDrawingContext dc) : base(editor, dc)
         {
-            MoveAnchor = parent;
-            Selected = editor.GetSelected();
-
+            Arrow = parent;
+            Anchor = anchor;            
         }
-        ISceneObject[] Selected;
-        MoveAnchor MoveAnchor;
+
+        
+
+        ArrowSceneObject Arrow;
+        ArrowMoveAnchor Anchor;
+
         public void Deselect()
         {
 
@@ -24,11 +26,8 @@ namespace Compounder
             if (isDrag)
             {
                 var diff = dc.GetCursor().World - startCursor;
-                foreach (var item in Selected.OfType<IOffsetableSceneObject>())
-                {
-                    item.SetLocation(startsLocations[item] + diff);
-                }
-                MoveAnchor.Location = startsLocations[MoveAnchor] + diff;
+                
+                Anchor.Location = startsLocations[Anchor] + diff;
             }
         }
         bool isDrag = false;
@@ -36,6 +35,11 @@ namespace Compounder
         Vector2d startCursor;
         public void MouseDown(UiMouseClickEvent mev)
         {
+            startsLocations.Clear();
+
+            startsLocations.Add(Anchor, Anchor.Location);
+            startCursor = DrawingContext.GetCursor().World;
+            isDrag = true;
 
         }
 
@@ -48,11 +52,8 @@ namespace Compounder
         public void Select()
         {
             startsLocations.Clear();
-            foreach (var item in Selected)
-            {
-                startsLocations.Add(item, item.Location);
-            }
-            startsLocations.Add(MoveAnchor, MoveAnchor.Location);
+            
+            startsLocations.Add(Anchor, Anchor.Location);
             startCursor = DrawingContext.GetCursor().World;
             isDrag = true;
         }

@@ -7,6 +7,8 @@ namespace Compounder.Interfaces
     {
         string Name { get; set; }
         bool IsSelected { get; set; }
+        bool IsHovered { get; set; }
+
         void Draw(DrawingContext dc);
         double ZOrder { get; set; }
         Vector2d Location { get; }
@@ -14,6 +16,7 @@ namespace Compounder.Interfaces
         void Event(IUIEvent ev);
         XElement ToXml();
         BBox GetBBox();
+        ISceneObject[] Childs { get; }
 
     }
 }

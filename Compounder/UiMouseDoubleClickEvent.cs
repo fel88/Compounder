@@ -2,7 +2,7 @@
 
 namespace Compounder
 {
-    public class UiMouseDoubleClickEvent : UiMouseEvent
+    public class UiMouseDoubleClickEvent : UiMouseClickEvent
     {
         public UiMouseDoubleClickEvent(DrawingContext dc, Control parent, IEditor editor) : base(dc, parent, editor)
         {

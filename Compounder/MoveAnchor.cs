@@ -45,7 +45,7 @@ namespace Compounder
         public void Event(IUIEvent ev)
         {
             var dc = ev.DrawingContext;
-            if (ev is UiMouseEvent mev)
+            if (ev is UiMouseClickEvent mev)
             {
                 if (mev.Button == MouseButtons.Left)
                 {
@@ -69,11 +69,5 @@ namespace Compounder
         {
             return null;
         }
-    }
-
-    public struct CursorPosition
-    {
-        public Vector2d World;
-        public Vector2d Screen;
     }
 }

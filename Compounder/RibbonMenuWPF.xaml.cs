@@ -113,6 +113,11 @@ namespace Compounder
         {
             Form.CreateArrow();
         }
+
+        private void Clear_click(object sender, RoutedEventArgs e)
+        {
+            Form.ClearProject();
+        }
     }
 
 }

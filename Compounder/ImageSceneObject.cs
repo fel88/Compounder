@@ -2,11 +2,12 @@
 using OpenTK.Mathematics;
 using System.Drawing.Imaging;
 using System.IO;
+using System.IO.MemoryMappedFiles;
 using System.Xml.Linq;
 
 namespace Compounder
 {
-    public class ImageSceneObject : AbstractSceneObject, ISceneObject,IOffsetableSceneObject
+    public class ImageSceneObject : AbstractSceneObject, ISceneObject, IOffsetableSceneObject
     {
         public ImageSceneObject() { }
         public ImageSceneObject(XElement el)
@@ -16,6 +17,12 @@ namespace Compounder
             var data = Convert.FromBase64String(el.Element("bmp").Value);
             MemoryStream ms = new MemoryStream(data);
             Bitmap = new Bitmap(ms);
+            if (el.Attribute("visible") != null)
+                Visible = bool.Parse(el.Attribute("visible").Value);
+
+            if (el.Attribute("borderDraw") != null)
+                BorderDraw = bool.Parse(el.Attribute("borderDraw").Value);
+
             var loc = el.Element("location");
             Location = new Vector2d(loc.Element("x").Value.ToDouble(),
                 loc.Element("y").Value.ToDouble());
@@ -30,7 +37,8 @@ namespace Compounder
             var rect = new RectangleF(Location.X.ToFloat(), Location.Y.ToFloat() - Bitmap.Height * ImgScale.ToFloat(), Bitmap.Width * ImgScale.ToFloat(), Bitmap.Height * ImgScale.ToFloat());
             return rect.Contains(location.X.ToFloat(), location.Y.ToFloat());
         }
-
+        public bool Visible { get; set; } = true;
+        public bool BorderDraw { get; set; } = true;
         public void Draw(DrawingContext dc)
         {
             var t0 = dc.Transform(Location);
@@ -42,13 +50,18 @@ namespace Compounder
             dc.gr.RotateTransform(Rotate.ToFloat());
             dc.gr.TranslateTransform(-t0.X, -t0.Y);
 
-            dc.gr.DrawImage(Bitmap, rect);
+            if (Visible)
+                dc.gr.DrawImage(Bitmap, rect);
+
+            if (BorderDraw)
+                dc.gr.DrawRectangle(new Pen(Color.Gray, 2), rect);
+
             dc.gr.Transform = trans;
             if (IsSelected)
             {
                 dc.gr.DrawRectangle(new Pen(Color.LightGreen, 3), rect);
             }
-            else if (CheckHovered(dc, dc.GetCursor()))
+            else if (IsHovered)
             {
                 dc.gr.DrawRectangle(new Pen(Color.Red, 3), rect);
             }
@@ -58,6 +71,13 @@ namespace Compounder
         public void Event(IUIEvent ev)
         {
             var dc = ev.DrawingContext;
+            if (ev is UiMouseMoveEvent mme)
+            {
+                IsHovered = CheckHovered(dc, mme.Location);
+                if (IsHovered)
+                    mme.Handled = true;
+            }
+            else
             if (ev is UiMouseDoubleClickEvent mdc)
             {
                 /*var d = AutoDialog.DialogHelpers.StartDialog();
@@ -72,6 +92,8 @@ namespace Compounder
                     dd.AddNumericField("scale", "Scale", ImgScale);
                     dd.AddNumericField("z", "ZOrder", ZOrder, min: -1000);
                     dd.AddNumericField("rotate", "Rotate", Rotate, min: -1000);
+                    dd.AddBoolField("visible", "Visible", Visible);
+                    dd.AddBoolField("borderDraw", "BorderDraw", BorderDraw);
                     if (!dd.ShowDialog())
                     {
                         ev.Handled = true;
@@ -81,11 +103,13 @@ namespace Compounder
                     ImgScale = dd.GetNumericField("scale");
                     ZOrder = dd.GetNumericField("z");
                     Rotate = dd.GetNumericField("rotate");
+                    Visible = dd.GetBoolField("visible");
+                    BorderDraw = dd.GetBoolField("borderDraw");
                     ev.Handled = true;
                     return;
                 }
             }
-            else if (ev is UiMouseEvent mev)
+            else if (ev is UiMouseClickEvent mev)
             {
                 if (mev.Button == MouseButtons.Left)
                 {
@@ -120,6 +144,8 @@ namespace Compounder
             Bitmap.Save(ms, ImageFormat.Png);
             ret.Add(new XAttribute("scale", ImgScale));
             ret.Add(new XAttribute("zOrder", ZOrder));
+            ret.Add(new XAttribute("visible", Visible));
+            ret.Add(new XAttribute("borderDraw", BorderDraw));
             ms.Seek(0, SeekOrigin.Begin);
             string base64String = Convert.ToBase64String(ms.ToArray());
             data.Add(new XCData(base64String));
