@@ -44,29 +44,43 @@ namespace Compounder
         {
             var t0 = dc.Transform(Location);
             var rect = new RectangleF(t0.X, t0.Y, Width.ToFloat() * dc.zoom, Height.ToFloat() * dc.zoom);
-
+            var font = new Font("Consolas", 18);
+            var ms = dc.gr.MeasureString(Text, font);
+            Vector2d pos = rect.Location.ToVector2d();
+            pos -= new Vector2d(ms.Width / 2, ms.Height / 2);
+            pos += new Vector2d(0.5 * Width * dc.zoom, 0.5 * Height * dc.zoom);
+            Color borderColor = Color.Black;
+            Color fillColor = Color.Yellow;
+            bool hovered = CheckHovered(dc, dc.GetCursor());
+            if (IsSelected)
+            {
+                borderColor = Color.LightGreen;
+            }
+            else if (hovered)
+            {
+                hovered = true;
+                borderColor = Color.Red;
+                fillColor = Color.Pink;
+            }
             var trans = dc.gr.Transform;
             dc.gr.TranslateTransform(t0.X, t0.Y);
 
             dc.gr.RotateTransform(Rotate.ToFloat());
             dc.gr.TranslateTransform(-t0.X, -t0.Y);
 
-            dc.gr.DrawRectangle(new Pen(Color.Black, 3), rect);
+            dc.gr.DrawRectangle(new Pen(borderColor, 3), rect);
             if (Fill)
-                dc.gr.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.Yellow)), rect);
+                dc.gr.FillRectangle(new SolidBrush(Color.FromArgb(128, fillColor)), rect);
+            dc.gr.DrawString(Text, font, Brushes.Black, pos.ToPointF());
+
             dc.gr.Transform = trans;
-
-            dc.gr.DrawString(Text, new Font("Consolas", 18), Brushes.Black, rect.Location);
-
-            if (IsSelected)
+            if (hovered)
             {
-                dc.gr.DrawRectangle(new Pen(Color.LightGreen, 3), rect);
+                var pos1 = dc.GetCursor().Screen.ToPointF();
+                var mss = dc.gr.MeasureString(Text, font);
+                dc.gr.FillRectangle(Brushes.White, pos1.X, pos1.Y-mss.Height, mss.Width, mss.Height);
+                dc.gr.DrawString(Text, font, Brushes.Black, pos1.X, pos1.Y - mss.Height);
             }
-            else if (CheckHovered(dc, dc.GetCursor()))
-            {
-                dc.gr.DrawRectangle(new Pen(Color.Red, 3), rect);
-            }
-
         }
 
         public void Event(IUIEvent ev)
@@ -87,6 +101,8 @@ namespace Compounder
                         ev.Handled = true;
 
                         var dd = AutoDialog.DialogHelpers.StartDialog();
+                        dd.AddNumericField("x", "X", Location.X, max: decimal.MaxValue, min: decimal.MinValue);
+                        dd.AddNumericField("y", "Y", Location.Y, max: decimal.MaxValue, min: decimal.MinValue);
                         dd.AddNumericField("width", "Width", Width);
                         dd.AddNumericField("height", "Height", Height);
                         dd.AddNumericField("rotate", "Rotate", Rotate);
@@ -97,6 +113,7 @@ namespace Compounder
                         if (!dd.ShowDialog())
                             return;
 
+                        Location = new Vector2d(dd.GetNumericField("x"), dd.GetNumericField("y"));
                         ZOrder = dd.GetNumericField("z");
                         Width = dd.GetNumericField("width");
                         Height = dd.GetNumericField("height");

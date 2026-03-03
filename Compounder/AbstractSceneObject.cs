@@ -2,6 +2,7 @@
 {
     public abstract class AbstractSceneObject
     {
+        public string Name { get; set; }
         public virtual double ZOrder { get; set; }
         public bool IsSelected { get; set; }
 

@@ -137,9 +137,10 @@ namespace Compounder
             var t0 = dc.Transform(0, 0);
             var t1 = dc.Transform(100, 0);
             var t2 = dc.Transform(0, 100);
-            dc.gr.DrawLine(Pens.Green, t0, t1);
-            dc.gr.DrawLine(Pens.Red, t0, t2);
-
+            dc.gr.DrawLine(Pens.Green, t0.ToPointF(), t1.ToPointF());
+            dc.gr.DrawLine(Pens.Red, t0.ToPointF(), t2.ToPointF());
+            var curp = dc.GetCursor();
+            toolStripStatusLabel1.Text = curp.World.X + "; " + curp.World.Y;
             var allSelected = (Objects.Where(z => z.IsSelected)).ToArray();
             var bboxes = allSelected.Select(z => z.GetBBox()).ToArray();
             if (bboxes.Any())
@@ -152,7 +153,7 @@ namespace Compounder
                     if (allSelected.Count() > 1)//draw outskirt
                     {
                         var t00 = dc.Transform(combinedBbox.Location);
-                        var rect = new RectangleF(t0.X, t0.Y, combinedBbox.Width.ToFloat() * dc.zoom, combinedBbox.Height.ToFloat() * dc.zoom);
+                        var rect = new RectangleF(t0.X.ToFloat(), t0.Y.ToFloat(), combinedBbox.Width.ToFloat() * dc.zoom, combinedBbox.Height.ToFloat() * dc.zoom);
                         dc.gr.DrawRectangle(pen, rect);
                     }
 
@@ -239,7 +240,8 @@ namespace Compounder
 
         internal void CreateRect()
         {
-            project.Objects.Add(new RectObject() { Width = 100, Height = 50, Text = "rect01" });
+            var pn = dc.BackTransform(pictureBox1.Width / 2, pictureBox1.Height / 2);
+            project.Objects.Add(new RectObject() { Width = 100, Height = 50, Text = "rect01", Location = pn });
         }
 
         public static Form2 Form;

@@ -154,20 +154,17 @@ namespace Compounder
             MouseUp?.Invoke(tt.X, tt.Y, e.Button);
         }
 
-        public event Action<float, float, MouseButtons> MouseUp;
-        public event Action<float, float, MouseButtons> MouseDown;
+        public event Action<double, double, MouseButtons> MouseUp;
+        public event Action<double, double, MouseButtons> MouseDown;
         public virtual PointF Transform(PointF p1)
         {
             return new PointF((p1.X + sx) * zoom, -(p1.Y + sy) * zoom);
         }
-        public virtual PointF Transform(float x, float y)
+        public virtual Vector2d Transform(double x, double y)
         {
-            return new PointF((x + sx) * zoom, -(y + sy) * zoom);
+            return new Vector2d((x + sx) * zoom, -(y + sy) * zoom);
         }
-        public virtual PointF Transform(double x, double y)
-        {
-            return new PointF((float)((x + sx) * zoom), (float)(-(y + sy) * zoom));
-        }
+        
 
         public virtual PointF Transform(Vector2d p1)
         {
@@ -180,11 +177,11 @@ namespace Compounder
             var posy = (-p1.Y / zoom - sy);
             return new PointF(posx, posy);
         }
-        public virtual PointF BackTransform(float x, float y)
+        public virtual Vector2d BackTransform(float x, float y)
         {
             var posx = (x / zoom - sx);
             var posy = (-y / zoom - sy);
-            return new PointF(posx, posy);
+            return new Vector2d(posx, posy);
         }
         public virtual PointF BackTransform(double x, double y)
         {
