@@ -1,7 +1,7 @@
 ﻿using OpenTK.Mathematics;
 using System.Xml.Linq;
 
-namespace Compounder
+namespace Compounder.Interfaces
 {
     public interface ISceneObject
     {
@@ -9,7 +9,7 @@ namespace Compounder
         void Draw(DrawingContext dc);
         double ZOrder { get; set; }
         Vector2d Location { get; }
-        bool CheckHovered(DrawingContext dctx, Vector2d location);
+        bool CheckHovered(DrawingContext dctx, CursorPosition location);
         void Event(IUIEvent ev);
         XElement ToXml();
         BBox GetBBox();

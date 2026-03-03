@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using Compounder.Interfaces;
+using OpenTK.Mathematics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Xml.Linq;
@@ -23,8 +24,9 @@ namespace Compounder
         public Vector2d Location { get; set; }
         PointF LocationF => new PointF(Location.X.ToFloat(), Location.Y.ToFloat());
 
-        public bool CheckHovered(DrawingContext dc, Vector2d location)
+        public bool CheckHovered(DrawingContext dc, CursorPosition curp)
         {
+            var location = curp.World;
             var rect = new RectangleF(Location.X.ToFloat(), Location.Y.ToFloat() - Bitmap.Height * ImgScale.ToFloat(), Bitmap.Width * ImgScale.ToFloat(), Bitmap.Height * ImgScale.ToFloat());
             return rect.Contains(location.X.ToFloat(), location.Y.ToFloat());
         }
@@ -139,6 +141,11 @@ namespace Compounder
         public void Offset(Vector2d v)
         {
             Location += v;
+        }
+
+        public void SetLocation(Vector2d location)
+        {
+            Location = location;
         }
     }
 }

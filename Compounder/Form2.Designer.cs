@@ -54,18 +54,19 @@
             // 
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { bringFrontToolStripMenuItem, sendBackToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(132, 48);
+            contextMenuStrip1.Size = new Size(181, 70);
             // 
             // bringFrontToolStripMenuItem
             // 
             bringFrontToolStripMenuItem.Name = "bringFrontToolStripMenuItem";
-            bringFrontToolStripMenuItem.Size = new Size(131, 22);
+            bringFrontToolStripMenuItem.Size = new Size(180, 22);
             bringFrontToolStripMenuItem.Text = "bring front";
+            bringFrontToolStripMenuItem.Click += bringFrontToolStripMenuItem_Click;
             // 
             // sendBackToolStripMenuItem
             // 
             sendBackToolStripMenuItem.Name = "sendBackToolStripMenuItem";
-            sendBackToolStripMenuItem.Size = new Size(131, 22);
+            sendBackToolStripMenuItem.Size = new Size(180, 22);
             sendBackToolStripMenuItem.Text = "send back";
             sendBackToolStripMenuItem.Click += sendBackToolStripMenuItem_Click;
             // 

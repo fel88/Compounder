@@ -8,5 +8,6 @@ namespace Compounder
         public static double ToDouble(this string str) => double.Parse(str.Replace(",", "."), CultureInfo.InvariantCulture);
         public static float ToFloat(this double d) => (float)d;
         public static Vector2d ToVector2d(this PointF d) => new Vector2d(d.X, d.Y);
+        public static PointF ToPointF(this Vector2d d) => new PointF(d.X.ToFloat(), d.Y.ToFloat());
     }
 }

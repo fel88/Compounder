@@ -1,4 +1,4 @@
-﻿namespace Compounder
+﻿namespace Compounder.Interfaces
 {
     public interface ISceneObjectCommand
     {

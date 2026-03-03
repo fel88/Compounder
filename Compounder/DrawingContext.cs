@@ -1,13 +1,18 @@
-﻿using OpenTK.Mathematics;
+﻿using Compounder.Interfaces;
+using OpenTK.Mathematics;
 
 namespace Compounder
 {
     public class DrawingContext : IDrawingContext
     {
+        public DrawingContext()
+        {
+
+        }
         public Graphics gr;
         public float scale = 1;
 
-
+        public IEditor Editor { get; set; }
         public float startx, starty;
         public float origsx, origsy;
         public Vector2d startReal;
@@ -32,12 +37,18 @@ namespace Compounder
             }
         }
 
-        public Vector2d GetCursor()
+        public CursorPosition GetCursor()
         {
             var p = PictureBox.PointToClient(Cursor.Position);
             var pn = BackTransform(p);
-            return pn.ToVector2d();
+            return new CursorPosition()
+            {
+                World = pn.ToVector2d(),
+                Screen = new Vector2d(p.X, p.Y)
+
+            };
         }
+
 
         public void Init(PictureBox pb)
         {

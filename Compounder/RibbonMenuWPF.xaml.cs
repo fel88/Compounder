@@ -39,6 +39,8 @@ namespace Compounder
 
         private void RibbonButton_Click(object sender, RoutedEventArgs e)
         {
+            if (AllItems.Count == 0)
+                return;
             DagreInputGraph dg = new DagreInputGraph();
             foreach (var item in AllItems)
             {

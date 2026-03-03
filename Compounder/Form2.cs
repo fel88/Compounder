@@ -1,4 +1,5 @@
-﻿using OpenTK.GLControl;
+﻿using Compounder.Interfaces;
+using OpenTK.GLControl;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -7,23 +8,22 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Media.Animation;
 using System.Xml.Linq;
 
 namespace Compounder
 {
-    public partial class Form2 : Form
+    public partial class Form2 : Form, IEditor
     {
         public Form2()
         {
             InitializeComponent();
             Form = this;
+            dc = new DrawingContext() { Editor = this };
             menu = new RibbonMenu();
             tableLayoutPanel1.Controls.Add(menu, 0, 0);
             menu.Height = 115;
@@ -48,6 +48,21 @@ namespace Compounder
                 if ((Math.Abs(dc.lastDragDiffX) + Math.Abs(dc.lastDragDiffY)) < 3)
                     contextMenuStrip1.Show(pictureBox1, e.Location);
             }
+
+            var curp = dc.GetCursor();
+            var me = new UiMouseEvent(dc, this, this) { Button = e.Button, Location = curp, Type = UiMouseEvent.UiMouseEventTypeEnum.ButtonUp };
+            if (_currentTool != null)
+            {
+                _currentTool.MouseUp(me);
+                return;
+            }
+            var ord = Objects.OrderBy(z => z.ZOrder).ToArray();
+            foreach (var item in ord.Reverse())
+            {
+                item.Event(me);
+                if (me.Handled)
+                    break;
+            }
         }
 
         private void PictureBox1_MouseDoubleClick(object? sender, MouseEventArgs e)
@@ -55,7 +70,7 @@ namespace Compounder
             if ((Control.ModifierKeys & Keys.Control) != 0)
                 return;
             var curp = dc.GetCursor();
-            var me = new UiMouseDoubleClickEvent(dc, this) { Button = e.Button, Location = curp };
+            var me = new UiMouseDoubleClickEvent(dc, this, this) { Button = e.Button, Location = curp };
             if (e.Button == MouseButtons.Left)
             {
                 foreach (var item in Objects)
@@ -66,7 +81,8 @@ namespace Compounder
             var ord = Objects.OrderBy(z => z.ZOrder).ToArray();
             foreach (var item in ord.Reverse())
             {
-                item.Event(me);
+                if (item.CheckHovered(dc, curp))
+                    item.Event(me);
                 if (me.Handled)
                     break;
             }
@@ -75,8 +91,17 @@ namespace Compounder
         private void PictureBox1_MouseDown(object? sender, MouseEventArgs e)
         {
             var curp = dc.GetCursor();
-            var me = new UiMouseEvent(dc, this) { Button = e.Button, Location = curp };
-            if (e.Button == MouseButtons.Left && (ModifierKeys & Keys.Control) == 0)
+            var me = new UiMouseEvent(dc, this, this) { Button = e.Button, Location = curp, Type = UiMouseEvent.UiMouseEventTypeEnum.ButtonDown };
+            if (_currentTool != null)
+            {
+                _currentTool.MouseDown(me);
+                return;
+            }
+            bool skip = false;
+            if (moveAnchor != null && moveAnchor.CheckHovered(dc, curp))
+                skip = true;
+
+            if (!skip && e.Button == MouseButtons.Left && (ModifierKeys & Keys.Control) == 0)
             {
                 foreach (var item in Objects)
                 {
@@ -92,9 +117,16 @@ namespace Compounder
             }
         }
 
-        DrawingContext dc = new DrawingContext();
+        DrawingContext dc = null;
 
         CompounderProject project = new CompounderProject();
+
+        MoveAnchor moveAnchor = null;
+
+        public ISceneObject[] GetSelected()
+        {
+            return (Objects.Where(z => z.IsSelected)).ToArray();
+        }
 
         private void PictureBox1_Paint(object? sender, PaintEventArgs e)
         {
@@ -123,14 +155,33 @@ namespace Compounder
                         var rect = new RectangleF(t0.X, t0.Y, combinedBbox.Width.ToFloat() * dc.zoom, combinedBbox.Height.ToFloat() * dc.zoom);
                         dc.gr.DrawRectangle(pen, rect);
                     }
-                    //draw snaps: rotate, move
+
+
+                    if (moveAnchor == null)
+                        moveAnchor = new MoveAnchor() { Location = combinedBbox.Location };
+                    else
+                        moveAnchor.Location = combinedBbox.Location;
+                    if (!VirtualObjects.Contains(moveAnchor))
+                    {
+                        //draw snaps: rotate, move
+                        VirtualObjects.Add(moveAnchor);
+                    }
+
+                }
+            }
+            else
+            {
+                if (moveAnchor != null)
+                {
+                    VirtualObjects.Remove(moveAnchor);
+                    moveAnchor = null;
                 }
             }
             foreach (var item in Objects.OrderBy(z => z.ZOrder))
             {
                 item.Draw(dc);
             }
-
+            _currentTool?.Draw(dc);
 
             dc.UpdateDrag();
         }
@@ -142,14 +193,18 @@ namespace Compounder
             // Invalidate will cause the Paint event on your GLControl to fire
             pictureBox1.Invalidate(); // _glControl is obviously a private reference to the GLControl
         }
-        List<ISceneObject> Objects => project.Objects;
+        List<ISceneObject> VirtualObjects = new List<ISceneObject>();
+        IReadOnlyList<ISceneObject> Objects => project.Objects.Concat(VirtualObjects).ToList();
+
+        public ITool CurrentTool => _currentTool;
+
         internal void ImportImage()
         {
             OpenFileDialog ofd = new OpenFileDialog();
             if (ofd.ShowDialog() != DialogResult.OK)
                 return;
 
-            Objects.Add(new ImageSceneObject() { Bitmap = (Bitmap)Bitmap.FromFile(ofd.FileName) });
+            project.Objects.Add(new ImageSceneObject() { Bitmap = (Bitmap)Bitmap.FromFile(ofd.FileName) });
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -164,7 +219,7 @@ namespace Compounder
         internal void DeleteSelected()
         {
             StackState();
-            Objects.RemoveAll(z => z.IsSelected);
+            project.Objects.RemoveAll(z => z.IsSelected);
         }
 
         internal void MoveSelected()
@@ -184,7 +239,7 @@ namespace Compounder
 
         internal void CreateRect()
         {
-            Objects.Add(new RectObject() { Width = 100, Height = 50, Text = "rect01" });
+            project.Objects.Add(new RectObject() { Width = 100, Height = 50, Text = "rect01" });
         }
 
         public static Form2 Form;
@@ -192,10 +247,10 @@ namespace Compounder
 
         private void sendBackToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var minZorder = Objects.Min(z => z.ZOrder) + 1;
-            foreach (var item in Objects.Where(z => z.IsSelected))
+            var minZorder = project.Objects.Min(z => z.ZOrder) - 1;
+            foreach (var item in project.Objects.Where(z => z.IsSelected))
             {
-                item.ZOrder -= minZorder;
+                item.ZOrder = minZorder;
             }
         }
 
@@ -234,7 +289,31 @@ namespace Compounder
 
         internal void CreateArrow()
         {
-            Objects.Add(new ArrowSceneObject() { Source = new ConnectorPoint() { RelativePositon = new Vector2d(0, 0) }, Target = new ConnectorPoint() { RelativePositon = new Vector2d(100, 100) } });
+            project.Objects.Add(new ArrowSceneObject() { Source = new ConnectorPoint() { RelativePositon = new Vector2d(0, 0) }, Target = new ConnectorPoint() { RelativePositon = new Vector2d(100, 100) } });
+        }
+
+        ITool DefaultTool = null;
+        public void ResetTool()
+        {
+            _currentTool?.Deselect();
+            SetTool(DefaultTool);
+        }
+
+        ITool _currentTool = null;
+        public void SetTool(ITool tool)
+        {
+            _currentTool?.Deselect();
+            _currentTool = tool;
+            _currentTool?.Select();
+        }
+
+        private void bringFrontToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var maxZorder = project.Objects.Max(z => z.ZOrder) + 1;
+            foreach (var item in project.Objects.Where(z => z.IsSelected))
+            {
+                item.ZOrder = maxZorder;
+            }
         }
     }
 }

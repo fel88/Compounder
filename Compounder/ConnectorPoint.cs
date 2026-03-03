@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using Compounder.Interfaces;
+using OpenTK.Mathematics;
 using System.Xml.Linq;
 
 namespace Compounder
@@ -12,8 +13,9 @@ namespace Compounder
         public Vector2d Location => RelativePositon + (Parent == null ? new Vector2d() : Parent.Location);
         public double Width = 10;
         public double Height = 10;
-        public bool CheckHovered(DrawingContext dc, Vector2d location)
+        public bool CheckHovered(DrawingContext dc, CursorPosition curp)
         {
+            var location = curp.World;
             var rect = new RectangleF(Location.X.ToFloat(), Location.Y.ToFloat() - Height.ToFloat(), Width.ToFloat(), Height.ToFloat());
             return rect.Contains(location.X.ToFloat(), location.Y.ToFloat());
         }

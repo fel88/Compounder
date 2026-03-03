@@ -18,6 +18,11 @@ namespace Compounder
             Height = height;
         }
 
+        public bool Contains(Vector2d v)
+        {
+            return v.X >= Location.X && v.Y >= Location.Y && v.X <= (Location.X + Width) && v.Y <= (Location.Y + Height);
+        }
+
         public Vector2d Location;
         public double Width;
         public double Height;

@@ -1,18 +1,22 @@
-﻿using OpenTK.Mathematics;
-using System.Windows.Input;
+﻿using Compounder.Interfaces;
+using OpenTK.Mathematics;
 
 namespace Compounder
 {
     public class UiMouseEvent : AbstractUiEvent, IUIEvent
     {
-        public Vector2d Location;
+        public CursorPosition Location;
         public MouseButtons Button;
-
-        public UiMouseEvent(DrawingContext dc, Control parent) : base(dc, parent)
+        public UiMouseEventTypeEnum Type;
+        public UiMouseEvent(DrawingContext dc, Control parent, IEditor editor) : base(dc, parent, editor)
         {
         }
 
-        
+        public enum UiMouseEventTypeEnum
+        {
+            ButtonDown, ButtonUp
+        }
+
 
     }
 }
