@@ -11,9 +11,16 @@ namespace Compounder
     public class RectObject : AbstractSceneObject, ISceneObject, IOffsetableSceneObject
     {
         public RectObject() { }
-        public RectObject(XElement elem)
+        public RectObject(XElement elem, ProjectXmlReStoreContext ctx)
         {
+            if (elem.Attribute("groupId") != null)
+            {
+                var gInd = int.Parse(elem.Attribute("groupId").Value);
+                if (!ctx.Groups.ContainsKey(gInd))
+                    ctx.Groups.Add(gInd, new SceneGroup());
 
+                Group = ctx.Groups[gInd];
+            }
             ZOrder = elem.Attribute("zOrder").Value.ToDouble();
             Width = elem.Attribute("width").Value.ToDouble();
             Height = elem.Attribute("height").Value.ToDouble();
@@ -75,7 +82,7 @@ namespace Compounder
             dc.gr.DrawString(Text, font, Brushes.Black, pos.ToPointF());
 
             dc.gr.Transform = trans;
-           
+
         }
 
         public void Event(IUIEvent ev)
@@ -152,10 +159,20 @@ namespace Compounder
             Location = location;
         }
 
-        public XElement ToXml()
+        public XElement ToXml(ProjectXmlStoreContext ctx)
         {
             XElement ret = new XElement("item");
             ret.Add(new XAttribute("kind", "rect"));
+
+
+            if (Group != null)
+            {
+                if (!ctx.Groups.Contains(Group))
+                {
+                    ctx.Groups.Add(Group);
+                }
+                ret.Add(new XAttribute("groupId", ctx.Groups.IndexOf(Group)));
+            }
 
             ret.Add(new XAttribute("zOrder", ZOrder));
             ret.Add(new XAttribute("fill", Fill));

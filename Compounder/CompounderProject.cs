@@ -8,7 +8,7 @@ namespace Compounder
         public CompounderProject() { }
         public CompounderProject(XElement element)
         {
-
+            ProjectXmlReStoreContext ctx = new ProjectXmlReStoreContext();
             foreach (var item in element.Elements())
             {
                 if (item.Name == "item")
@@ -26,19 +26,20 @@ namespace Compounder
                     else
                     if (kind == "rect")
                     {
-                        Objects.Add(new RectObject(item));
+                        Objects.Add(new RectObject(item, ctx));
                     }
                 }
             }
         }
-        public List<ISceneObject> Objects = new List<ISceneObject>();
 
+        public List<ISceneObject> Objects = new List<ISceneObject>();
         internal XElement ToXml()
         {
+            ProjectXmlStoreContext ctx = new ProjectXmlStoreContext();
             XElement xElement = new XElement("project");
             foreach (var obj in Objects)
             {
-                var element = obj.ToXml();
+                var element = obj.ToXml(ctx);
                 if (element != null)
                     xElement.Add(element);
             }

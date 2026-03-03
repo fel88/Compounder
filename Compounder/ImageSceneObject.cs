@@ -135,7 +135,7 @@ namespace Compounder
             }
         }
 
-        public XElement ToXml()
+        public XElement ToXml(ProjectXmlStoreContext ctx)
         {
             XElement ret = new XElement("item");
             ret.Add(new XAttribute("kind", "image"));

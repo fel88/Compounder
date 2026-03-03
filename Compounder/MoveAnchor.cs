@@ -65,7 +65,7 @@ namespace Compounder
         }
 
 
-        public XElement ToXml()
+        public XElement ToXml(ProjectXmlStoreContext ctx)
         {
             return null;
         }

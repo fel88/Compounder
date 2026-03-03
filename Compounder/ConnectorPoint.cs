@@ -49,7 +49,7 @@ namespace Compounder
             return new BBox(Location.X, Location.Y, 1, 1);
         }
 
-        public XElement ToXml()
+        public XElement ToXml(ProjectXmlStoreContext ctx)
         {
             return null;
         }

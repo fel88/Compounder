@@ -197,7 +197,17 @@ namespace Compounder
                 if (mme.Handled)
                     break;
             }
+            //groups routine
 
+            var groups = Objects.Where(z => z.IsHovered && z.Group != null).Select(z => z.Group).Distinct().ToArray();
+            foreach (var item in groups)
+            {
+                var objs = Objects.Where(z => z.Group == item).ToArray();
+                foreach (var item2 in objs)
+                {
+                    item2.IsHovered = true;
+                }
+            }
             foreach (var item in Objects.OrderBy(z => z.ZOrder))
             {
                 item.Draw(dc);
@@ -215,6 +225,8 @@ namespace Compounder
                 dc.gr.FillRectangle(Brushes.White, pos1.X, pos1.Y - mss.Height, mss.Width, mss.Height);
                 dc.gr.DrawString(item.Text, font, Brushes.Black, pos1.X, pos1.Y - mss.Height);
             }
+            
+
             dc.UpdateDrag();
         }
 
@@ -364,6 +376,23 @@ namespace Compounder
         {
             project.Objects.Clear();
             VirtualObjects.Clear();
+        }
+
+        internal void GroupSelected()
+        {
+            var gr = new SceneGroup();
+            foreach (var item in Objects.Where(z=>z.IsSelected))
+            {
+                item.Group = gr;
+            }
+        }
+
+        internal void UnGroupSelected()
+        {
+            foreach (var item in Objects.Where(z => z.IsSelected))
+            {
+                item.Group = null;
+            }
         }
     }
 }

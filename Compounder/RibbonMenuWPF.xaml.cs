@@ -118,6 +118,17 @@ namespace Compounder
         {
             Form.ClearProject();
         }
+
+        private void Group_click(object sender, RoutedEventArgs e)
+        {
+            Form.GroupSelected();
+        }
+
+        private void Ungroup_click(object sender, RoutedEventArgs e)
+        {
+            Form.UnGroupSelected();
+
+        }
     }
 
 }

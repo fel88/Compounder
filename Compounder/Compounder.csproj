@@ -27,6 +27,8 @@
     <None Remove="Icons\blue-document-view.png" />
     <None Remove="Icons\blue-document.png" />
     <None Remove="Icons\broom.png" />
+    <None Remove="Icons\chain-unchain.png" />
+    <None Remove="Icons\chain.png" />
     <None Remove="Icons\color.png" />
     <None Remove="Icons\cross-button.ico" />
     <None Remove="Icons\cursor.ico" />
@@ -85,6 +87,8 @@
     <Resource Include="Icons\blue-document-view.png" />
     <Resource Include="Icons\blue-document.png" />
     <Resource Include="Icons\broom.png" />
+    <Resource Include="Icons\chain-unchain.png" />
+    <Resource Include="Icons\chain.png" />
     <Resource Include="Icons\color.png" />
     <Resource Include="Icons\cross-button.ico" />
     <Resource Include="Icons\cursor.ico" />

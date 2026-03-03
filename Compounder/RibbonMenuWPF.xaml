@@ -113,7 +113,18 @@
                         SmallImageSource="Icons/arrow-045.png" />
                 </RibbonGroup>
 
-
+                <RibbonGroup x:Name="groups" Header="Groups">
+                    <RibbonButton
+                        Click="Group_click"
+                        KeyTip="B"
+                        Label="Group"
+                        SmallImageSource="Icons/chain.png" />
+                    <RibbonButton
+                        Click="Ungroup_click"
+                        KeyTip="B"
+                        Label="Ungroup"
+                        SmallImageSource="Icons/chain-unchain.png" />
+                </RibbonGroup>
 
 
                 <RibbonGroup x:Name="settings" Header="Settings ">

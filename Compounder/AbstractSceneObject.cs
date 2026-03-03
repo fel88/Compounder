@@ -9,5 +9,6 @@ namespace Compounder
         public bool IsSelected { get; set; }
         public bool IsHovered { get; set; }
         public ISceneObject[] Childs { get; set; }
+        public SceneGroup Group { get; set; }
     }
 }
