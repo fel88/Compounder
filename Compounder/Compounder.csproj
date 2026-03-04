@@ -67,6 +67,7 @@
     <None Remove="Icons\puzzle.png" />
     <None Remove="Icons\question.png" />
     <None Remove="Icons\ruler-triangle.png" />
+    <None Remove="Icons\wrench-screwdriver.png" />
     <None Remove="shaders\text.fs" />
     <None Remove="shaders\text.vs" />
   </ItemGroup>
@@ -128,6 +129,7 @@
     <Resource Include="Icons\puzzle.png" />
     <Resource Include="Icons\question.png" />
     <Resource Include="Icons\ruler-triangle.png" />
+    <Resource Include="Icons\wrench-screwdriver.png" />
     <EmbeddedResource Include="shaders\text.fs" />
     <EmbeddedResource Include="shaders\text.vs" />
   </ItemGroup>

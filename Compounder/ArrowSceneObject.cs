@@ -72,6 +72,8 @@ namespace Compounder
 
         public bool CheckHovered(DrawingContext dc, CursorPosition curp)
         {
+            if (!IsHoverable)
+                return false;
             var location = curp.World;
             var bbox = GetBBox();
             var rect = new RectangleF(bbox.Location.X.ToFloat(), bbox.Location.Y.ToFloat(), bbox.Width.ToFloat(), bbox.Height.ToFloat());
@@ -79,6 +81,7 @@ namespace Compounder
         }
 
         public float LineWidth = 3;
+        public bool IsHoverable = true;
 
         public void Draw(DrawingContext dc)
         {

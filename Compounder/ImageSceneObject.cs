@@ -3,6 +3,7 @@ using OpenTK.Mathematics;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Net.Http.Headers;
 using System.Xml.Linq;
 
 namespace Compounder
@@ -12,6 +13,9 @@ namespace Compounder
         public ImageSceneObject() { }
         public ImageSceneObject(XElement el)
         {
+            if (el.Attribute("opacity") != null)
+                Opacity = el.Attribute("opacity").Value.ToDouble();
+
             ImgScale = el.Attribute("scale").Value.ToDouble();
             ZOrder = el.Attribute("zOrder").Value.ToDouble();
             var data = Convert.FromBase64String(el.Element("bmp").Value);
@@ -37,8 +41,35 @@ namespace Compounder
             var rect = new RectangleF(Location.X.ToFloat(), Location.Y.ToFloat() - Bitmap.Height * ImgScale.ToFloat(), Bitmap.Width * ImgScale.ToFloat(), Bitmap.Height * ImgScale.ToFloat());
             return rect.Contains(location.X.ToFloat(), location.Y.ToFloat());
         }
+
+        public static void DrawImageWithOpacity(Graphics graphics, Image image, Rectangle rect, float opacity)
+        {
+            // Create a ColorMatrix object and set its alpha component (Matrix33)
+            ColorMatrix colorMatrix = new ColorMatrix();
+            colorMatrix.Matrix33 = opacity; // Opacity value is a float between 0.0 and 1.0
+
+            // Create an ImageAttributes object
+            ImageAttributes imageAttributes = new ImageAttributes();
+            // Set the color matrix for the ImageAttributes object
+            imageAttributes.SetColorMatrix(
+                colorMatrix,
+                ColorMatrixFlag.Default,
+                ColorAdjustType.Bitmap);
+
+            // Draw the image using the ImageAttributes with the desired opacity
+            graphics.DrawImage(
+                image,
+                rect,             // Destination rectangle
+                0, 0,             // Source rectangle X and Y
+                image.Width,      // Source rectangle width
+                image.Height,     // Source rectangle height
+                GraphicsUnit.Pixel,
+                imageAttributes);
+        }
+
         public bool Visible { get; set; } = true;
         public bool BorderDraw { get; set; } = true;
+        public double Opacity { get; set; } = 100;
         public void Draw(DrawingContext dc)
         {
             var t0 = dc.Transform(Location);
@@ -51,7 +82,12 @@ namespace Compounder
             dc.gr.TranslateTransform(-t0.X, -t0.Y);
 
             if (Visible)
-                dc.gr.DrawImage(Bitmap, rect);
+            {
+                if (Opacity > 99)
+                    dc.gr.DrawImage(Bitmap, rect);
+                else
+                    DrawImageWithOpacity(dc.gr, Bitmap, new Rectangle((int)rect.X, (int)rect.Y, (int)rect.Width, (int)rect.Height), Opacity.ToFloat() / 100f);
+            }
 
             if (BorderDraw)
                 dc.gr.DrawRectangle(new Pen(Color.Gray, 2), rect);
@@ -92,6 +128,7 @@ namespace Compounder
                     dd.AddNumericField("scale", "Scale", ImgScale);
                     dd.AddNumericField("z", "ZOrder", ZOrder, min: -1000);
                     dd.AddNumericField("rotate", "Rotate", Rotate, min: -1000);
+                    dd.AddNumericField("opacity", "Opactity", Opacity, min: 0, max: 100);
                     dd.AddBoolField("visible", "Visible", Visible);
                     dd.AddBoolField("borderDraw", "BorderDraw", BorderDraw);
                     if (!dd.ShowDialog())
@@ -100,6 +137,7 @@ namespace Compounder
                         return;
                     }
 
+                    Opacity = dd.GetNumericField("opacity");
                     ImgScale = dd.GetNumericField("scale");
                     ZOrder = dd.GetNumericField("z");
                     Rotate = dd.GetNumericField("rotate");
@@ -143,6 +181,7 @@ namespace Compounder
             MemoryStream ms = new MemoryStream();
             Bitmap.Save(ms, ImageFormat.Png);
             ret.Add(new XAttribute("scale", ImgScale));
+            ret.Add(new XAttribute("opacity", Opacity));
             ret.Add(new XAttribute("zOrder", ZOrder));
             ret.Add(new XAttribute("visible", Visible));
             ret.Add(new XAttribute("borderDraw", BorderDraw));

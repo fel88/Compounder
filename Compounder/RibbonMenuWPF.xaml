@@ -39,6 +39,7 @@
                         Label="Selection"
                         SmallImageSource="Icons/cursor.ico" />
                     <RibbonButton
+                        Click="FitAll_click"
                         KeyTip="F"
                         Label="Fit all"
                         SmallImageSource="Icons/magnifier.ico" />
@@ -125,6 +126,11 @@
                         KeyTip="B"
                         Label="Ungroup"
                         SmallImageSource="Icons/chain-unchain.png" />
+                    <RibbonButton
+                        Click="GroupSettings_click"
+                        KeyTip="B"
+                        Label="Settings"
+                        SmallImageSource="Icons/wrench-screwdriver.png" />
                 </RibbonGroup>
 
                 <RibbonGroup x:Name="layers" Header="Layers">

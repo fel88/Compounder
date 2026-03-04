@@ -139,6 +139,16 @@ namespace Compounder
         {
             Form.ResetTool();
         }
+
+        private void GroupSettings_click(object sender, RoutedEventArgs e)
+        {
+            Form.GroupSettings();
+        }
+
+        private void FitAll_click(object sender, RoutedEventArgs e)
+        {
+            Form.FitAll();
+        }
     }
 
 }

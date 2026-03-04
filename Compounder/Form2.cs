@@ -28,6 +28,7 @@ namespace Compounder
             dc = new DrawingContext() { Editor = this };
             var ll = new LayersList();
             ll.Init(this);
+            dc.ZoomFactor = 1.2f;
             tableLayoutPanel1.Controls.Add(ll, 1, 1);
             ll.Dock = DockStyle.Fill;
             menu = new RibbonMenu();
@@ -41,7 +42,9 @@ namespace Compounder
             _timer.Start();
             var mf = new MessageFilter();
             pictureBox1.Dock = DockStyle.Fill;
+            pictureBox1.MouseWheel += PictureBox1_MouseWheel;
             pictureBox1.Paint += PictureBox1_Paint;
+            pictureBox1.MouseMove += PictureBox1_MouseMove;
             System.Windows.Forms.Application.AddMessageFilter(mf);
             dc.Init(pictureBox1);
             pictureBox1.MouseDown += PictureBox1_MouseDown;
@@ -49,8 +52,19 @@ namespace Compounder
             pictureBox1.MouseDoubleClick += PictureBox1_MouseDoubleClick;
         }
 
+        private void PictureBox1_MouseWheel(object? sender, MouseEventArgs e)
+        {
+            dirty = true;
+        }
+
+        private void PictureBox1_MouseMove(object? sender, MouseEventArgs e)
+        {
+            dirty = true;
+        }
+
         private void PictureBox1_MouseUp(object? sender, MouseEventArgs e)
         {
+            dirty = true;
             if (e.Button == MouseButtons.Right)
             {
                 if ((Math.Abs(dc.lastDragDiffX) + Math.Abs(dc.lastDragDiffY)) < 3)
@@ -75,6 +89,7 @@ namespace Compounder
 
         private void PictureBox1_MouseDoubleClick(object? sender, MouseEventArgs e)
         {
+            dirty = true;
             if ((Control.ModifierKeys & Keys.Control) != 0)
                 return;
             var curp = dc.GetCursor();
@@ -98,6 +113,7 @@ namespace Compounder
 
         private void PictureBox1_MouseDown(object? sender, MouseEventArgs e)
         {
+            dirty = true;
             var curp = dc.GetCursor();
             var me = new UiMouseClickEvent(dc, this, this) { Button = e.Button, Location = curp, Type = UiMouseClickEvent.UiMouseEventTypeEnum.ButtonDown };
             if (_currentTool != null)
@@ -221,6 +237,46 @@ namespace Compounder
             _currentTool?.Draw(dc);
 
             //post draw effects
+            DrawTooltip();
+            if (ShowLinesBetweenGroupsElementsWhenHover || ShowLinesBetweenAllGroupsElements)
+                DrawGroupLines();
+
+            dc.UpdateDrag();
+            dirty = false;
+        }
+        ArrowSceneObject.CurveTypeEnum ArrowBetweenElementsCurveType = ArrowSceneObject.CurveTypeEnum.Rect;
+        private void DrawGroupLines()
+        {
+            var groups = Objects.Where(z => z.IsHovered && z.Group != null).Select(z => z.Group).Distinct().ToArray();
+            if (ShowLinesBetweenAllGroupsElements)
+                groups = Objects.Where(z => z.Group != null).Select(z => z.Group).Distinct().ToArray();
+
+            foreach (var item in groups)
+            {
+                var objs = Objects.Where(z => z.Group == item).ToArray();
+                for (int i = 0; i < objs.Length; i++)
+                {
+                    var objA = objs[i];
+                    for (int j = i + 1; j < objs.Length; j++)
+                    {
+                        var objB = objs[j];
+                        //draw line 
+                        var temp = new ArrowSceneObject()
+                        {
+                            IsHoverable = false,
+                            DrawEndCap = false,
+                            CurveType = ArrowBetweenElementsCurveType
+                        };
+                        temp.Source.RelativePositon = objA.GetBBox().Center;
+                        temp.Target.RelativePositon = objB.GetBBox().Center;
+                        temp.Draw(dc);
+                    }
+                }
+            }
+        }
+
+        private void DrawTooltip()
+        {
             foreach (var item in Objects.OfType<RectObject>())
             {
                 if (!item.IsHovered)
@@ -240,15 +296,16 @@ namespace Compounder
             }
 
 
-            dc.UpdateDrag();
         }
 
         System.Timers.Timer _timer;
+        bool dirty = false;
         private void TimerElapsed(object sender, ElapsedEventArgs e)
         {
             //UpdateModel(); // this is where you'd do whatever you need to do to update your model per frame
             // Invalidate will cause the Paint event on your GLControl to fire
-            pictureBox1.Invalidate(); // _glControl is obviously a private reference to the GLControl
+            if (dirty)
+                pictureBox1.Invalidate(); // _glControl is obviously a private reference to the GLControl
         }
         public List<ISceneObject> VirtualObjects { get; private set; } = new List<ISceneObject>();
         IReadOnlyList<ISceneObject> Objects => project.Objects.Concat(VirtualObjects).ToList();
@@ -272,6 +329,7 @@ namespace Compounder
             {
                 DeleteSelected();
             }
+            dirty = true;
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
@@ -419,6 +477,37 @@ namespace Compounder
             }
             else
                 tableLayoutPanel1.ColumnStyles[1].Width = 0;
+        }
+
+        bool ShowLinesBetweenGroupsElementsWhenHover = false;
+        bool ShowLinesBetweenAllGroupsElements = false;
+        internal void GroupSettings()
+        {
+            var d = AutoDialog.DialogHelpers.StartDialog();
+            d.AddBoolField("ShowLinesBetweenGroupsElementsWhenHover", "ShowLinesBetweenGroupsElementsWhenHover", ShowLinesBetweenGroupsElementsWhenHover);
+            d.AddBoolField("ShowLinesBetweenAllGroupsElements", "ShowLinesBetweenAllGroupsElements", ShowLinesBetweenAllGroupsElements);
+            d.AddOptionsField("ArrowBetweenElementsCurveType", "ArrowBetweenElementsCurveType", Enum.GetNames<ArrowSceneObject.CurveTypeEnum>(), ArrowBetweenElementsCurveType.ToString());
+
+            if (!d.ShowDialog())
+                return;
+
+            ShowLinesBetweenGroupsElementsWhenHover = d.GetBoolField("ShowLinesBetweenGroupsElementsWhenHover");
+            ShowLinesBetweenAllGroupsElements = d.GetBoolField("ShowLinesBetweenAllGroupsElements");
+            ArrowBetweenElementsCurveType = Enum.Parse<ArrowSceneObject.CurveTypeEnum>(d.GetOptionsField("ArrowBetweenElementsCurveType"));
+        }
+
+        internal void FitAll()
+        {
+            if (!Objects.Any())
+                return;
+            var combinedBbox = Objects.Select(z => z.GetBBox()).Aggregate((z, y) => z.Combine(y));
+            const int gap = 10;
+            dc.FitToPoints(new PointF[]
+            {
+                new PointF (combinedBbox.Location.X.ToFloat()-gap,combinedBbox.Location.Y.ToFloat()-gap),
+                new PointF (combinedBbox.Right.ToFloat()+gap,combinedBbox.Bottom.ToFloat()+gap)
+            });
+            dirty = true;
         }
     }
 }

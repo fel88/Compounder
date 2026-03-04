@@ -29,6 +29,9 @@ namespace Compounder
         public double Right => Location.X + Width;
         public double Bottom => Location.Y + Height;
         public double Area => Width * Height;
+
+        public Vector2d Center => new Vector2d(Location.X + Width / 2, Location.Y + Height / 2);
+
         public BBox Combine(BBox b)
         {
             var minx = Math.Min(Location.X, b.Location.X);
