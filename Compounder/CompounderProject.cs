@@ -9,7 +9,8 @@ namespace Compounder
         public CompounderProject(XElement element)
         {
             ProjectXmlReStoreContext ctx = new ProjectXmlReStoreContext();
-            foreach (var item in element.Elements())
+            var objs = element.Element("objects");
+            foreach (var item in objs.Elements())
             {
                 if (item.Name == "item")
                 {
@@ -32,16 +33,29 @@ namespace Compounder
             }
         }
 
+        public List<SceneLayer> Layers = new List<SceneLayer>();
         public List<ISceneObject> Objects = new List<ISceneObject>();
         internal XElement ToXml()
         {
-            ProjectXmlStoreContext ctx = new ProjectXmlStoreContext();
+            ProjectXmlStoreContext ctx = new ProjectXmlStoreContext() { Project = this };
             XElement xElement = new XElement("project");
+            XElement lel = new XElement("layers");
+            XElement objs = new XElement("objects");
+
+            xElement.Add(lel);
+            xElement.Add(objs);
+            foreach (var item in Layers)
+            {
+                var x = item.ToXml();
+                x.Add(new XAttribute("id", Layers.IndexOf(item)));
+                lel.Add(x);
+            }
+
             foreach (var obj in Objects)
             {
                 var element = obj.ToXml(ctx);
                 if (element != null)
-                    xElement.Add(element);
+                    objs.Add(element);
             }
             return xElement;
         }

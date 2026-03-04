@@ -47,6 +47,7 @@ namespace Compounder
 
         public void Select()
         {
+            Editor.StackState();
             startsLocations.Clear();
             foreach (var item in Selected)
             {

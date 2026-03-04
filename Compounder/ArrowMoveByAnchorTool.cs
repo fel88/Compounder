@@ -35,12 +35,7 @@ namespace Compounder
         Vector2d startCursor;
         public void MouseDown(UiMouseClickEvent mev)
         {
-            startsLocations.Clear();
-
-            startsLocations.Add(Anchor, Anchor.Location);
-            startCursor = DrawingContext.GetCursor().World;
-            isDrag = true;
-
+            Select();
         }
 
         public void MouseUp(UiMouseClickEvent mev)
@@ -51,6 +46,7 @@ namespace Compounder
 
         public void Select()
         {
+            Editor.StackState();
             startsLocations.Clear();
             
             startsLocations.Add(Anchor, Anchor.Location);

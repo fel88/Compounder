@@ -26,8 +26,14 @@ namespace Compounder
             InitializeComponent();
             Form = this;
             dc = new DrawingContext() { Editor = this };
+            var ll = new LayersList();
+            ll.Init(this);
+            tableLayoutPanel1.Controls.Add(ll, 1, 1);
+            ll.Dock = DockStyle.Fill;
             menu = new RibbonMenu();
+
             tableLayoutPanel1.Controls.Add(menu, 0, 0);
+            tableLayoutPanel1.SetColumnSpan(menu, 2);
             menu.Height = 115;
             menu.Dock = DockStyle.Top;
             _timer = new System.Timers.Timer(10.0); // in milliseconds - you might have to play with this value to throttle your framerate depending on how involved your update and render code is
@@ -157,7 +163,7 @@ namespace Compounder
                     {
                         var t00 = dc.Transform(combinedBbox.Location);
                         var rect = new RectangleF(t0.X.ToFloat(), t0.Y.ToFloat(), combinedBbox.Width.ToFloat() * dc.zoom, combinedBbox.Height.ToFloat() * dc.zoom);
-                        dc.gr.DrawRectangle(pen, rect);
+                        //dc.gr.DrawRectangle(pen, rect);
                     }
 
 
@@ -219,13 +225,20 @@ namespace Compounder
             {
                 if (!item.IsHovered)
                     continue;
+
+                if (!item.CheckHovered(dc, dc.GetCursor()))
+                    continue;
+
+                if (string.IsNullOrEmpty(item.Text))
+                    continue;
+
                 var font = new System.Drawing.Font("Consolas", 18);
                 var pos1 = dc.GetCursor().Screen.ToPointF();
                 var mss = dc.gr.MeasureString(item.Text, font);
                 dc.gr.FillRectangle(Brushes.White, pos1.X, pos1.Y - mss.Height, mss.Width, mss.Height);
                 dc.gr.DrawString(item.Text, font, Brushes.Black, pos1.X, pos1.Y - mss.Height);
             }
-            
+
 
             dc.UpdateDrag();
         }
@@ -241,6 +254,8 @@ namespace Compounder
         IReadOnlyList<ISceneObject> Objects => project.Objects.Concat(VirtualObjects).ToList();
 
         public ITool CurrentTool => _currentTool;
+
+        public SceneLayer ActiveLayer { get; set; }
 
         internal void ImportImage()
         {
@@ -345,7 +360,8 @@ namespace Compounder
 
         internal void CreateArrow()
         {
-            project.Objects.Add(new ArrowSceneObject() { Source = new ConnectorPoint() { RelativePositon = new Vector2d(0, 0) }, Target = new ConnectorPoint() { RelativePositon = new Vector2d(100, 100) } });
+            SetTool(new ArrowCreationTool(this, dc));
+            //project.Objects.Add(new ArrowSceneObject() { Source = new ConnectorPoint() { RelativePositon = new Vector2d(0, 0) }, Target = new ConnectorPoint() { RelativePositon = new Vector2d(100, 100) } });
         }
 
         ITool DefaultTool = null;
@@ -381,7 +397,7 @@ namespace Compounder
         internal void GroupSelected()
         {
             var gr = new SceneGroup();
-            foreach (var item in Objects.Where(z=>z.IsSelected))
+            foreach (var item in Objects.Where(z => z.IsSelected))
             {
                 item.Group = gr;
             }
@@ -393,6 +409,16 @@ namespace Compounder
             {
                 item.Group = null;
             }
+        }
+
+        internal void SwitchLayersPanelVisible()
+        {
+            if (tableLayoutPanel1.ColumnStyles[1].Width == 0)
+            {
+                tableLayoutPanel1.ColumnStyles[1].Width = 300;
+            }
+            else
+                tableLayoutPanel1.ColumnStyles[1].Width = 0;
         }
     }
 }

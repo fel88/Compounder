@@ -21,23 +21,28 @@ namespace Compounder
             var loc = el.Element("source");
             Source.RelativePositon = new Vector2d(loc.Element("x").Value.ToDouble(), loc.Element("y").Value.ToDouble());
 
+            if (el.Attribute("drawEndCap") != null)
+                DrawEndCap = bool.Parse(el.Attribute("drawEndCap").Value);
+
+            if (el.Attribute("lineWidth") != null)
+                LineWidth = el.Attribute("lineWidth").Value.ToDouble().ToFloat();
+
             if (el.Element("target") != null)
             {
                 var loc2 = el.Element("target");
                 Target.RelativePositon = new Vector2d(loc2.Element("x").Value.ToDouble(), loc2.Element("y").Value.ToDouble());
             }
-            if (el.Element("curveType") != null)
-            {
-                var type = el.Element("curveType");
-                CurveType = Enum.Parse<CurveTypeEnum>(el.Element("curveType").Value);
-            }
+
+            if (el.Attribute("curveType") != null)                            
+                CurveType = Enum.Parse<CurveTypeEnum>(el.Attribute("curveType").Value);
+            
 
             InitAnchors();
 
             TargetAnchor.Location = Target.RelativePositon;
             SourceAnchor.Location = Source.RelativePositon;
         }
-
+        public bool DrawEndCap { get; set; } = true;
         private void InitAnchors()
         {
             TargetAnchor = new ArrowMoveAnchor(this, (x) =>
@@ -73,6 +78,8 @@ namespace Compounder
             return rect.Contains(location.X.ToFloat(), location.Y.ToFloat());
         }
 
+        public float LineWidth = 3;
+
         public void Draw(DrawingContext dc)
         {
 
@@ -84,57 +91,51 @@ namespace Compounder
 
             var from = dc.Transform(Source.Location);
             var to = dc.Transform(Target.Location);
-            int cw = 12; float arrowWidth = 5.0f;
+            int cw = 12;
+            float arrowWidth = 5.0f;
             float arrowHeight = 5.0f;
             bool isFilled = true; // Set to true for a filled arrow
             AdjustableArrowCap myArrow = new AdjustableArrowCap(arrowWidth, arrowHeight, isFilled);
 
             // You can further adjust properties after creation
-            myArrow.Width = 10.0f;
-            myArrow.Height = 15.0f;
+            myArrow.Width = 6.0f;
+            myArrow.Height = 9.0f;
             myArrow.MiddleInset = 2.0f;
             bool hovered = CheckHovered(dc, dc.GetCursor());
             // 2. Create a Pen object
-            Pen p = new Pen(Color.LightGreen, 3);
+            Pen p = new Pen(Color.LightGreen, LineWidth);
 
-            // 3. Assign the custom cap to the start or end of the line
-            if (IsSelected || hovered)
-            {
-                if (!dc.Editor.VirtualObjects.Contains(TargetAnchor))
-                {
-                    dc.Editor.VirtualObjects.Add(TargetAnchor);
-                }
-                if (!dc.Editor.VirtualObjects.Contains(SourceAnchor))
-                {
-                    dc.Editor.VirtualObjects.Add(SourceAnchor);
-                }
-            }
-            else
-            {
-                if (dc.Editor.CurrentTool is not ArrowMoveByAnchorTool)
-                {
-                    if (dc.Editor.VirtualObjects.Contains(TargetAnchor))
-                        dc.Editor.VirtualObjects.Remove(TargetAnchor);
 
-                    if (dc.Editor.VirtualObjects.Contains(SourceAnchor))
-                        dc.Editor.VirtualObjects.Remove(SourceAnchor);
-                }
-            }
             //dc.gr.DrawRectangle(new Pen(Color.LightGreen, 1), rect);
             if (IsSelected)
             {
-                p = new Pen(Color.LightBlue, 3);
+                p = new Pen(Color.LightBlue, LineWidth);
 
             }
             else if (hovered)
             {
-                p = new Pen(Color.Red, 3);
+                p = new Pen(Color.Red, LineWidth);
                 // dc.gr.DrawRectangle(new Pen(Color.Red, 3), rect);
             }
-            p.CustomEndCap = myArrow;
+
+            if (DrawEndCap)
+                p.CustomEndCap = myArrow;
+
+            if (CurveType == CurveTypeEnum.Rect)
+            {
+                var midX = (to.X + from.X) / 2;
+
+                dc.gr.DrawLines(p, [
+                    new PointF(from.X,from.Y),
+                    new PointF(midX,from.Y),
+                    new PointF(midX,to.Y),
+                    new PointF(to.X,to.Y),
+                ]);
 
 
-            if (CurveType == CurveTypeEnum.Line)
+            }
+            else
+           if (CurveType == CurveTypeEnum.Line)
             {
                 dc.gr.DrawLine(p, from.X, from.Y, to.X, to.Y);
             }
@@ -160,6 +161,13 @@ namespace Compounder
                 dc.gr.DrawBezier(p, pos1.ToPointF(), cp1.ToPointF(), cp2.ToPointF(), rpos2.ToPointF());
             }
 
+
+            foreach (var item in Childs)
+            {
+                if (IsHovered || IsSelected || item.CheckHovered(dc, dc.GetCursor()))
+                    item.Draw(dc);
+            }
+
             //dc.gr.DrawEllipse(Pens.Blue, from.X - cw / 2, from.Y - cw / 2, cw, cw);
             // dc.gr.DrawEllipse(Pens.Blue, to.X - cw / 2, to.Y - cw / 2, cw, cw);
 
@@ -167,11 +175,15 @@ namespace Compounder
 
         public enum CurveTypeEnum
         {
-            Line, Bezier
+            Line, Bezier, Rect
         }
         public CurveTypeEnum CurveType { get; set; }
         public void Event(IUIEvent ev)
         {
+            foreach (var item in Childs)
+            {
+                item.Event(ev);
+            }
             var dc = ev.DrawingContext;
             if (ev is UiMouseMoveEvent mme)
             {
@@ -193,7 +205,9 @@ namespace Compounder
                     var dd = AutoDialog.DialogHelpers.StartDialog();
 
                     dd.AddNumericField("z", "ZOrder", ZOrder, min: -1000);
-                    dd.AddOptionsField("curveType", "Curve type", ["line", "bezier"], 0);
+                    dd.AddNumericField("lineWidth", "Line width", LineWidth, min: 1);
+                    dd.AddBoolField("drawEndCap", "Draw end cap", DrawEndCap);
+                    dd.AddOptionsField("curveType", "Curve type", Enum.GetNames(typeof(CurveTypeEnum)), CurveType.ToString());
 
                     if (!dd.ShowDialog())
                     {
@@ -201,16 +215,17 @@ namespace Compounder
                         return;
                     }
 
-
+                    DrawEndCap = dd.GetBoolField("drawEndCap");
                     ZOrder = dd.GetNumericField("z");
-                    CurveType = dd.GetOptionsFieldIdx("curveType") == 0 ? CurveTypeEnum.Line : CurveTypeEnum.Bezier;
+                    LineWidth = dd.GetNumericField("lineWidth").ToFloat();
+                    CurveType = Enum.Parse<CurveTypeEnum>(dd.GetOptionsField("curveType"));
                     ev.Handled = true;
                     return;
                 }
             }
             else if (ev is UiMouseClickEvent mev)
             {
-                if (mev.Button == MouseButtons.Left)
+                if (mev.Type == UiMouseClickEvent.UiMouseEventTypeEnum.ButtonUp && mev.Button == MouseButtons.Left)
                 {
                     if ((Control.ModifierKeys & Keys.Control) != 0)// xor mode
                     {
@@ -242,7 +257,9 @@ namespace Compounder
 
 
             ret.Add(new XAttribute("zOrder", ZOrder));
+            ret.Add(new XAttribute("lineWidth", LineWidth));
             ret.Add(new XAttribute("curveType", CurveType));
+            ret.Add(new XAttribute("drawEndCap", DrawEndCap));
 
             XElement loc = new XElement("source");
 

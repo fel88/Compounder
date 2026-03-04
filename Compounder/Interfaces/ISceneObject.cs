@@ -17,6 +17,7 @@ namespace Compounder.Interfaces
         XElement ToXml(ProjectXmlStoreContext ctx);
         BBox GetBBox();
         ISceneObject[] Childs { get; }
+        SceneLayer Layer { get; set; }
 
     }
 }

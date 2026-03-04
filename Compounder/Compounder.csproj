@@ -7,6 +7,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>True</UseWPF>
+	  <NoWarn>$(NoWarn);WFO1000</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -53,6 +54,7 @@
     <None Remove="Icons\layer-shape-round.png" />
     <None Remove="Icons\layer-shape-text.png" />
     <None Remove="Icons\layer-shape.ico" />
+    <None Remove="Icons\layers-stack.png" />
     <None Remove="Icons\license-key.png" />
     <None Remove="Icons\light-bulb-off.png" />
     <None Remove="Icons\light-bulb.ico" />
@@ -113,6 +115,7 @@
     <Resource Include="Icons\layer-shape-round.png" />
     <Resource Include="Icons\layer-shape-text.png" />
     <Resource Include="Icons\layer-shape.ico" />
+    <Resource Include="Icons\layers-stack.png" />
     <Resource Include="Icons\license-key.png" />
     <Resource Include="Icons\light-bulb-off.png" />
     <Resource Include="Icons\light-bulb.ico" />

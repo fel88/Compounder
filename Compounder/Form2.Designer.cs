@@ -46,7 +46,7 @@
             // 
             pictureBox1.Location = new Point(3, 3);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(1178, 733);
+            pictureBox1.Size = new Size(1028, 733);
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
             // 
@@ -54,26 +54,27 @@
             // 
             contextMenuStrip1.Items.AddRange(new ToolStripItem[] { bringFrontToolStripMenuItem, sendBackToolStripMenuItem });
             contextMenuStrip1.Name = "contextMenuStrip1";
-            contextMenuStrip1.Size = new Size(181, 70);
+            contextMenuStrip1.Size = new Size(132, 48);
             // 
             // bringFrontToolStripMenuItem
             // 
             bringFrontToolStripMenuItem.Name = "bringFrontToolStripMenuItem";
-            bringFrontToolStripMenuItem.Size = new Size(180, 22);
+            bringFrontToolStripMenuItem.Size = new Size(131, 22);
             bringFrontToolStripMenuItem.Text = "bring front";
             bringFrontToolStripMenuItem.Click += bringFrontToolStripMenuItem_Click;
             // 
             // sendBackToolStripMenuItem
             // 
             sendBackToolStripMenuItem.Name = "sendBackToolStripMenuItem";
-            sendBackToolStripMenuItem.Size = new Size(180, 22);
+            sendBackToolStripMenuItem.Size = new Size(131, 22);
             sendBackToolStripMenuItem.Text = "send back";
             sendBackToolStripMenuItem.Click += sendBackToolStripMenuItem_Click;
             // 
             // tableLayoutPanel1
             // 
-            tableLayoutPanel1.ColumnCount = 1;
+            tableLayoutPanel1.ColumnCount = 2;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+            tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 0F));
             tableLayoutPanel1.Controls.Add(pictureBox1, 0, 1);
             tableLayoutPanel1.Dock = DockStyle.Fill;
             tableLayoutPanel1.Location = new Point(0, 0);

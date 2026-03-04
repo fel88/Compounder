@@ -8,6 +8,8 @@
         CompounderProject Project { get;  }
         ISceneObject[] GetSelected();
         List<ISceneObject> VirtualObjects { get; } 
+        SceneLayer ActiveLayer { get; set; }
+        void StackState();
 
     }
 }

@@ -33,7 +33,8 @@
                 KeyTip="H">
                 <!--  Home  group  -->
                 <RibbonGroup x:Name="General" Header="General">
-                    <RibbonToggleButton
+                    <RibbonButton
+                        Click="Selection_click"
                         KeyTip="X"
                         Label="Selection"
                         SmallImageSource="Icons/cursor.ico" />
@@ -126,6 +127,14 @@
                         SmallImageSource="Icons/chain-unchain.png" />
                 </RibbonGroup>
 
+                <RibbonGroup x:Name="layers" Header="Layers">
+                    <RibbonButton
+                        Click="ShowHideLayersPanel_click"
+                        KeyTip="B"
+                        Label="Show/hide panel"
+                        SmallImageSource="Icons/layers-stack.png" />
+
+                </RibbonGroup>
 
                 <RibbonGroup x:Name="settings" Header="Settings ">
                     <RibbonButton Label="Settings" SmallImageSource="Icons/gear.png" />

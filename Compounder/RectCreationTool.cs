@@ -65,6 +65,7 @@ namespace Compounder
                 var maxy = curs.Max(z => z.World.Y);
                 var w = maxx - minx;
                 var h = maxy - miny;
+                Editor.StackState();
                 Editor.Project.Objects.Add(new RectObject()
                 {
                     Width = w,

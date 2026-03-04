@@ -29,6 +29,9 @@ namespace Compounder
             if (elem.Element("text") != null)
                 Text = elem.Element("text").Value;
 
+            if (elem.Attribute("drawString") != null)
+                DrawString = bool.Parse(elem.Attribute("drawString").Value);
+
             var loc = elem.Element("location");
             Location = new Vector2d(loc.Element("x").Value.ToDouble(),
                 loc.Element("y").Value.ToDouble());
@@ -40,6 +43,7 @@ namespace Compounder
         public double Rotate { get; set; }
         public string Text { get; set; }
         public bool Fill { get; set; }
+        public bool DrawString { get; set; } = true;
         public bool CheckHovered(DrawingContext dc, CursorPosition curp)
         {
             var location = curp.World;
@@ -79,7 +83,9 @@ namespace Compounder
             dc.gr.DrawRectangle(new Pen(borderColor, 3), rect);
             if (Fill)
                 dc.gr.FillRectangle(new SolidBrush(Color.FromArgb(128, fillColor)), rect);
-            dc.gr.DrawString(Text, font, Brushes.Black, pos.ToPointF());
+
+            if (DrawString)
+                dc.gr.DrawString(Text, font, Brushes.Black, pos.ToPointF());
 
             dc.gr.Transform = trans;
 
@@ -118,6 +124,7 @@ namespace Compounder
                         dd.AddNumericField("z", "ZOrder", ZOrder);
                         dd.AddStringField("text", "Text", Text);
                         dd.AddBoolField("fill", "Fill", Fill);
+                        dd.AddBoolField("drawString", "Draw string", DrawString);
 
                         if (!dd.ShowDialog())
                             return;
@@ -129,16 +136,31 @@ namespace Compounder
                         Rotate = dd.GetNumericField("rotate");
                         Text = dd.GetStringField("text");
                         Fill = dd.GetBoolField("fill");
+                        DrawString = dd.GetBoolField("drawString");
                     }
                 }
             }
             else if (ev is UiMouseClickEvent mev)
             {
-                if (mev.Button == MouseButtons.Left)
+                if (mev.Type == UiMouseClickEvent.UiMouseEventTypeEnum.ButtonUp && mev.Button == MouseButtons.Left)
                 {
-                    IsSelected = CheckHovered(dc, mev.Location);
-                    if (IsSelected)
-                        ev.Handled = true;
+                    if ((Control.ModifierKeys & Keys.Control) != 0)// xor mode
+                    {
+                        if (CheckHovered(dc, mev.Location))
+                        {
+                            IsSelected = !IsSelected;
+                            ev.Handled = true;
+                        }
+                    }
+                    else
+                    {
+                        var res = CheckHovered(dc, mev.Location);
+                        IsSelected = res;
+
+                        if (IsSelected && res)
+                            ev.Handled = true;
+                    }
+
                     return;
                 }
             }
@@ -176,6 +198,7 @@ namespace Compounder
 
             ret.Add(new XAttribute("zOrder", ZOrder));
             ret.Add(new XAttribute("fill", Fill));
+            ret.Add(new XAttribute("drawString", DrawString));
             ret.Add(new XAttribute("width", Width));
             ret.Add(new XAttribute("height", Height));
             ret.Add(new XAttribute("rotate", Rotate));

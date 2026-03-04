@@ -111,7 +111,7 @@ namespace Compounder
             }
             else if (ev is UiMouseClickEvent mev)
             {
-                if (mev.Button == MouseButtons.Left)
+                if (mev.Type == UiMouseClickEvent.UiMouseEventTypeEnum.ButtonUp && mev.Button == MouseButtons.Left)
                 {
                     if ((Control.ModifierKeys & Keys.Control) != 0)// xor mode
                     {

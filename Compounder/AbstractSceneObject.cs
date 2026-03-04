@@ -10,5 +10,6 @@ namespace Compounder
         public bool IsHovered { get; set; }
         public ISceneObject[] Childs { get; set; }
         public SceneGroup Group { get; set; }
+        public SceneLayer Layer { get; set; }
     }
 }

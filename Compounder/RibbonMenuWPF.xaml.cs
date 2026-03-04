@@ -129,6 +129,16 @@ namespace Compounder
             Form.UnGroupSelected();
 
         }
+
+        private void ShowHideLayersPanel_click(object sender, RoutedEventArgs e)
+        {
+            Form.SwitchLayersPanelVisible();
+        }
+
+        private void Selection_click(object sender, RoutedEventArgs e)
+        {
+            Form.ResetTool();
+        }
     }
 
 }
