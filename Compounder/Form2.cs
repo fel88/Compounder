@@ -238,9 +238,10 @@ namespace Compounder
             _currentTool?.Draw(dc);
 
             //post draw effects
-            DrawTooltip();
             if (ShowLinesBetweenGroupsElementsWhenHover || ShowLinesBetweenAllGroupsElements)
                 DrawGroupLines();
+
+            DrawTooltip();
 
             dc.UpdateDrag();
             dirty = false;

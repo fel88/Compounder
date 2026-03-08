@@ -209,7 +209,7 @@ namespace Compounder
             ret.Add(new XAttribute("height", Height));
             ret.Add(new XAttribute("rotate", Rotate));
             ret.Add(new XElement("text", new XCData(Text)));
-            ret.Add(new XElement("description", new XCData(Description)));
+            ret.Add(new XElement("description", new XCData(Description ?? string.Empty)));
 
 
             XElement loc = new XElement("location");
