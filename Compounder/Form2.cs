@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Interop;
 using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Header;
@@ -289,13 +290,28 @@ namespace Compounder
                     continue;
 
                 var font = new System.Drawing.Font("Consolas", 18);
+                var fontBold = new System.Drawing.Font("Consolas", 18, System.Drawing.FontStyle.Bold);
                 var pos1 = dc.GetCursor().Screen.ToPointF();
-                var mss = dc.gr.MeasureString(item.Text, font);
-                dc.gr.FillRectangle(Brushes.White, pos1.X, pos1.Y - mss.Height, mss.Width, mss.Height);
-                dc.gr.DrawString(item.Text, font, Brushes.Black, pos1.X, pos1.Y - mss.Height);
+                var totalText = item.Text;
+                if (!string.IsNullOrEmpty(item.Description))
+                    totalText += "\\n" + item.Description;
+
+                var lines = totalText.Split("\\n").ToArray();
+                double yy = 0;
+                List<SizeF> sizes = new List<SizeF>();
+                foreach (var mitem in lines)
+                {
+                    sizes.Add(dc.gr.MeasureString(mitem, font));
+                }
+                var maxx = sizes.Max(z => z.Width);
+                dc.gr.FillRectangle(Brushes.AliceBlue, pos1.X, pos1.Y - sizes.Sum(z => z.Height), maxx, sizes.Sum(z => z.Height));
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    var mss = sizes[i];
+                    dc.gr.DrawString(lines[i], (i == 0 && lines.Length > 1) ? fontBold : font, Brushes.Black, pos1.X, (int)yy + pos1.Y - sizes.Sum(z => z.Height));
+                    yy += mss.Height;
+                }
             }
-
-
         }
 
         System.Timers.Timer _timer;

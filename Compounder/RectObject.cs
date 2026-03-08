@@ -29,6 +29,9 @@ namespace Compounder
             if (elem.Element("text") != null)
                 Text = elem.Element("text").Value;
 
+            if (elem.Element("description") != null)
+                Description = elem.Element("description").Value;
+
             if (elem.Attribute("drawString") != null)
                 DrawString = bool.Parse(elem.Attribute("drawString").Value);
 
@@ -42,6 +45,7 @@ namespace Compounder
         public double Height { get; set; }
         public double Rotate { get; set; }
         public string Text { get; set; }
+        public string Description { get; set; }
         public bool Fill { get; set; }
         public bool DrawString { get; set; } = true;
         public bool CheckHovered(DrawingContext dc, CursorPosition curp)
@@ -123,6 +127,7 @@ namespace Compounder
                         dd.AddNumericField("rotate", "Rotate", Rotate);
                         dd.AddNumericField("z", "ZOrder", ZOrder);
                         dd.AddStringField("text", "Text", Text);
+                        dd.AddStringField("description", "Description", Description);
                         dd.AddBoolField("fill", "Fill", Fill);
                         dd.AddBoolField("drawString", "Draw string", DrawString);
 
@@ -135,6 +140,7 @@ namespace Compounder
                         Height = dd.GetNumericField("height");
                         Rotate = dd.GetNumericField("rotate");
                         Text = dd.GetStringField("text");
+                        Description = dd.GetStringField("description");
                         Fill = dd.GetBoolField("fill");
                         DrawString = dd.GetBoolField("drawString");
                     }
@@ -203,6 +209,7 @@ namespace Compounder
             ret.Add(new XAttribute("height", Height));
             ret.Add(new XAttribute("rotate", Rotate));
             ret.Add(new XElement("text", new XCData(Text)));
+            ret.Add(new XElement("description", new XCData(Description)));
 
 
             XElement loc = new XElement("location");
